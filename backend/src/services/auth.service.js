@@ -9,7 +9,7 @@ const AuthService = {
     const user = await UserRepository.findByEmail(email);
     if (!user) throw new Error('Credenciales inválidas');
 
-    const valid = await bcrypt.compare(password, user.password_hash || user.password);
+    const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) throw new Error('Credenciales inválidas');
 
     const token = jwt.sign(

@@ -36,15 +36,35 @@ async function initDb() {
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
-      id          SERIAL PRIMARY KEY,
-      tenant_id   INT REFERENCES tenants(id) ON DELETE CASCADE,
-      name        VARCHAR(255) NOT NULL,
-      email       VARCHAR(255) UNIQUE NOT NULL,
-      password    VARCHAR(255) NOT NULL,
-      role        VARCHAR(30) NOT NULL DEFAULT 'CAJERO',
-      is_active   BOOLEAN DEFAULT TRUE,
-      created_at  TIMESTAMP DEFAULT NOW()
+      id            SERIAL PRIMARY KEY,
+      tenant_id     INT REFERENCES tenants(id) ON DELETE CASCADE,
+      name          VARCHAR(255) NOT NULL,
+      email         VARCHAR(255) UNIQUE NOT NULL,
+      password_hash VARCHAR(255) NOT NULL DEFAULT '',
+      role          VARCHAR(30) NOT NULL DEFAULT 'CAJERO',
+      sede_id       INT,
+      is_active     BOOLEAN DEFAULT TRUE,
+      created_at    TIMESTAMP DEFAULT NOW()
     );
+  `);
+
+  // Migrate: rename 'password' to 'password_hash' if old schema exists
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='password')
+         AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='password_hash') THEN
+        ALTER TABLE users RENAME COLUMN password TO password_hash;
+      END IF;
+      -- Add password_hash if missing entirely
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='password_hash') THEN
+        ALTER TABLE users ADD COLUMN password_hash VARCHAR(255) NOT NULL DEFAULT '';
+      END IF;
+      -- Add sede_id if missing
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='sede_id') THEN
+        ALTER TABLE users ADD COLUMN sede_id INT;
+      END IF;
+    END $$;
   `);
 
   await pool.query(`
@@ -200,7 +220,7 @@ async function initDb() {
 
     const hash = await bcrypt.hash('SuperAdmin123!', 10);
     await pool.query(`
-      INSERT INTO users (tenant_id, name, email, password, role)
+      INSERT INTO users (tenant_id, name, email, password_hash, role)
       VALUES ($1, 'Super Administrador', 'super@parkos.io', $2, 'SUPERADMIN')
     `, [tenantId, hash]);
 
