@@ -20,7 +20,11 @@ const spotRoutes = require('./routes/spot.routes');
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:5173'] }));
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? true  // allow all in production (Coolify handles SSL/domain)
+  : ['http://localhost:3000', 'http://localhost:5173'];
+
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ limit: '5mb', extended: true }));
 
