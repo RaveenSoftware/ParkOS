@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const initDb = require('./init_db');
 
 const authRoutes = require('./routes/auth.routes');
 const saasRoutes = require('./routes/saas.routes');
@@ -45,6 +46,13 @@ app.use('/api/spots', spotRoutes);
 
 app.get('/api/health', (req, res) => res.json({ status: 'OK', service: 'ParkOS API' }));
 
-app.listen(PORT, () => {
-  console.log(`🚗 ParkOS Backend corriendo en http://localhost:${PORT}`);
-});
+initDb()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`🚗 ParkOS Backend corriendo en http://localhost:${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error('❌ Error fatal iniciando la base de datos:', err.message);
+    process.exit(1);
+  });
