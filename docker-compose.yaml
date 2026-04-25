@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: parkos_user
+      POSTGRES_PASSWORD: parkos_password
+      POSTGRES_DB: parkos_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./setup_db.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U parkos_user -d parkos_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - DATABASE_URL=postgresql://parkos_user:parkos_password@db:5432/parkos_db
+      - JWT_SECRET=${JWT_SECRET:-my_super_secret_jwt_key_123_parkos}
+      - PORT=8080
+      - NODE_ENV=production
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    expose:
+      - 8080
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
