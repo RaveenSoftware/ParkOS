@@ -3,7 +3,7 @@
  * Se ejecuta cada vez que el backend arranca (idempotente).
  */
 const pool = require('./config/database');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 
 async function initDb() {
   console.log('🔧 Verificando esquema de base de datos...');
