@@ -20,9 +20,13 @@ async function request(method, endpoint, body) {
   });
 
   if (res.status === 401) {
-    localStorage.clear();
-    window.location.href = '/login';
-    return;
+    // On login page: don't redirect, let the form handle the error
+    const isLoginPage = window.location.pathname === '/login';
+    if (!isLoginPage) {
+      localStorage.clear();
+      window.location.href = '/login';
+      return;
+    }
   }
 
   const data = await res.json().catch(() => ({}));

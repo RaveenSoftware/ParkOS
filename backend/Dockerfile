@@ -1,3 +1,4 @@
+# Build: 2026-04-25-v2 (auto-init db on startup)
 FROM node:20-alpine
 
 WORKDIR /app
