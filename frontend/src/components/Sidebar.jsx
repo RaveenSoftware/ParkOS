@@ -23,7 +23,14 @@ export default function Sidebar() {
     }).catch(() => {});
 
     if (user.role === 'ADMIN_TENANT' || user.role === 'SUPERADMIN') {
-      api.get('/sedes').then(setSedes).catch(() => {});
+      api.get('/sedes').then(data => {
+        setSedes(data);
+        const currentSedeId = localStorage.getItem('parkos_pos_sedeId');
+        if (data.length > 0 && !currentSedeId) {
+          localStorage.setItem('parkos_pos_sedeId', data[0].id);
+          window.location.reload();
+        }
+      }).catch(() => {});
     }
 
     const handleConfigUpdate = (e) => {
@@ -79,7 +86,7 @@ export default function Sidebar() {
             onChange={handleSedeChange}
             className="w-full bg-black border border-white/10 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none focus:border-indigo-500"
           >
-            <option value="">— Ninguna (Error) —</option>
+            <option value="">— Seleccionar Sede —</option>
             {sedes.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
         </div>
