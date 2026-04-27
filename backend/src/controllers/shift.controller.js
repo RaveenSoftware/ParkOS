@@ -9,9 +9,9 @@ const ShiftController = {
       const result = await pool.query(`
         SELECT id, start_time, starting_cash, status 
         FROM cash_shifts 
-        WHERE user_id = $1 AND sede_id = $2 AND status = 'OPEN' 
+        WHERE user_id IS NOT DISTINCT FROM $1 AND sede_id = $2 AND status = 'OPEN' 
         ORDER BY start_time DESC LIMIT 1
-      `, [userId, sedeId]);
+      `, [userId === -1 ? null : userId, sedeId]);
 
       if (result.rows.length === 0) {
         return res.json({ active: false });
@@ -31,8 +31,8 @@ const ShiftController = {
 
       // Verificar si ya tiene uno abierto
       const check = await pool.query(`
-        SELECT id FROM cash_shifts WHERE user_id = $1 AND sede_id = $2 AND status = 'OPEN'
-      `, [userId, sedeId]);
+        SELECT id FROM cash_shifts WHERE user_id IS NOT DISTINCT FROM $1 AND sede_id = $2 AND status = 'OPEN'
+      `, [userId === -1 ? null : userId, sedeId]);
 
       if (check.rows.length > 0) {
         return res.status(400).json({ error: 'Ya tienes un turno abierto en esta sede.' });
@@ -41,7 +41,7 @@ const ShiftController = {
       const result = await pool.query(`
         INSERT INTO cash_shifts (tenant_id, sede_id, user_id, starting_cash, status)
         VALUES ($1, $2, $3, $4, 'OPEN') RETURNING *
-      `, [tenantId, sedeId, userId, startingCash || 0]);
+      `, [tenantId, sedeId, userId === -1 ? null : userId, startingCash || 0]);
 
       res.status(201).json(result.rows[0]);
     } catch (err) {
@@ -59,7 +59,7 @@ const ShiftController = {
       // Calcular expected_cash
       // Suma de starting_cash + (todos los tickets cerrados en este turno pagados en efectivo)
       // Asumiremos que todos los tickets de momento son en efectivo para este MVP.
-      const shiftRes = await pool.query('SELECT starting_cash, start_time FROM cash_shifts WHERE id = $1 AND user_id = $2', [shiftId, userId]);
+      const shiftRes = await pool.query('SELECT starting_cash, start_time FROM cash_shifts WHERE id = $1 AND user_id IS NOT DISTINCT FROM $2', [shiftId, userId === -1 ? null : userId]);
       if (shiftRes.rows.length === 0) return res.status(404).json({ error: 'Turno no encontrado' });
       
       const { starting_cash, start_time } = shiftRes.rows[0];
@@ -67,8 +67,8 @@ const ShiftController = {
       // Sumar tickets
       const ticketsRes = await pool.query(`
         SELECT SUM(amount) as total_tickets FROM tickets 
-        WHERE created_by = $1 AND sede_id = $2 AND status = 'CERRADO' AND exit_at > $3
-      `, [userId, sedeId, start_time]);
+        WHERE created_by IS NOT DISTINCT FROM $1 AND sede_id = $2 AND status = 'CERRADO' AND exit_at > $3
+      `, [userId === -1 ? null : userId, sedeId, start_time]);
 
       const totalTickets = parseFloat(ticketsRes.rows[0].total_tickets || 0);
 

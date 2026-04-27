@@ -6,7 +6,7 @@ const TicketRepository = {
       const res = await pool.query(
         `INSERT INTO tickets (plate, vehicle_type, created_by, sede_id, spot_id, client_name, client_doc)
          VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
-        [plate.toUpperCase(), type, userId, sedeId, spotId || null, clientName || null, clientDoc || null]
+        [plate.toUpperCase(), type, userId === -1 ? null : userId, sedeId, spotId || null, clientName || null, clientDoc || null]
       );
       return res.rows[0];
     } catch (err) {
