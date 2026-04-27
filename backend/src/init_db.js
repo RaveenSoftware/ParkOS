@@ -30,6 +30,7 @@ async function initDb() {
       max_sedes     INT NOT NULL DEFAULT 1,
       max_users     INT NOT NULL DEFAULT 5,
       max_spots     INT NOT NULL DEFAULT 50,
+      features      JSONB DEFAULT '[]',
       created_at    TIMESTAMP DEFAULT NOW()
     );
   `);
@@ -39,6 +40,9 @@ async function initDb() {
       id                  SERIAL PRIMARY KEY,
       name                VARCHAR(255) NOT NULL,
       plan_id             INT REFERENCES saas_plans(id),
+      document_id         VARCHAR(50),
+      contact_email       VARCHAR(255),
+      phone               VARCHAR(50),
       subscription_status VARCHAR(30) DEFAULT 'TRIAL',
       subscription_start  DATE,
       subscription_end    DATE,
@@ -91,6 +95,18 @@ async function initDb() {
       
       IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='tenants' AND column_name='is_active') THEN
         ALTER TABLE tenants ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
+      END IF;
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='tenants' AND column_name='document_id') THEN
+        ALTER TABLE tenants ADD COLUMN document_id VARCHAR(50);
+      END IF;
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='tenants' AND column_name='contact_email') THEN
+        ALTER TABLE tenants ADD COLUMN contact_email VARCHAR(255);
+      END IF;
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='tenants' AND column_name='phone') THEN
+        ALTER TABLE tenants ADD COLUMN phone VARCHAR(50);
+      END IF;
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='saas_plans' AND column_name='features') THEN
+        ALTER TABLE saas_plans ADD COLUMN features JSONB DEFAULT '[]';
       END IF;
     END $$;
   `);
