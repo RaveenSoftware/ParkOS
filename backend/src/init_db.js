@@ -8,6 +8,19 @@ const bcrypt = require('bcrypt');
 async function initDb() {
   console.log('🔧 Verificando esquema de base de datos...');
 
+  // Migrate: rename 'plans' table to 'saas_plans' if old schema exists
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='plans') THEN
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='saas_plans') THEN
+          DROP TABLE saas_plans CASCADE;
+        END IF;
+        ALTER TABLE plans RENAME TO saas_plans;
+      END IF;
+    END $$;
+  `);
+
   // ── TABLAS BASE ──
   await pool.query(`
     CREATE TABLE IF NOT EXISTS saas_plans (
@@ -19,16 +32,6 @@ async function initDb() {
       max_spots     INT NOT NULL DEFAULT 50,
       created_at    TIMESTAMP DEFAULT NOW()
     );
-  `);
-
-  // Migrate: rename 'plans' table to 'saas_plans' if old schema exists
-  await pool.query(`
-    DO $$
-    BEGIN
-      IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='plans') THEN
-        ALTER TABLE plans RENAME TO saas_plans;
-      END IF;
-    END $$;
   `);
 
   await pool.query(`
