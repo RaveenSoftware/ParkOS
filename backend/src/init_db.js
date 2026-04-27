@@ -10,7 +10,7 @@ async function initDb() {
 
   // ── TABLAS BASE ──
   await pool.query(`
-    CREATE TABLE IF NOT EXISTS plans (
+    CREATE TABLE IF NOT EXISTS saas_plans (
       id            SERIAL PRIMARY KEY,
       name          VARCHAR(100) NOT NULL,
       price         NUMERIC(10,2) NOT NULL DEFAULT 0,
@@ -21,11 +21,21 @@ async function initDb() {
     );
   `);
 
+  // Migrate: rename 'plans' table to 'saas_plans' if old schema exists
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='plans') THEN
+        ALTER TABLE plans RENAME TO saas_plans;
+      END IF;
+    END $$;
+  `);
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS tenants (
       id                  SERIAL PRIMARY KEY,
       name                VARCHAR(255) NOT NULL,
-      plan_id             INT REFERENCES plans(id),
+      plan_id             INT REFERENCES saas_plans(id),
       subscription_status VARCHAR(30) DEFAULT 'TRIAL',
       subscription_start  DATE,
       subscription_end    DATE,
@@ -67,6 +77,16 @@ async function initDb() {
     END $$;
   `);
 
+  // Migrate tickets: rename 'user_id' to 'created_by' if old schema exists
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='tickets' AND column_name='user_id') THEN
+        ALTER TABLE tickets RENAME COLUMN user_id TO created_by;
+      END IF;
+    END $$;
+  `);
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS sedes (
       id          SERIAL PRIMARY KEY,
@@ -97,7 +117,7 @@ async function initDb() {
       id            SERIAL PRIMARY KEY,
       sede_id       INT REFERENCES sedes(id),
       spot_id       INT REFERENCES spots(id),
-      user_id       INT REFERENCES users(id),
+      created_by    INT REFERENCES users(id),
       plate         VARCHAR(20) NOT NULL,
       vehicle_type  VARCHAR(30) DEFAULT 'CARRO',
       entry_at      TIMESTAMP DEFAULT NOW(),
@@ -194,11 +214,11 @@ async function initDb() {
   console.log('✅ Esquema de base de datos verificado.');
 
   // ── SEED: Plan y SuperAdmin por defecto ──
-  const planCheck = await pool.query(`SELECT id FROM plans WHERE name = 'Enterprise' LIMIT 1`);
+  const planCheck = await pool.query(`SELECT id FROM saas_plans WHERE name = 'Enterprise' LIMIT 1`);
   let planId;
   if (planCheck.rows.length === 0) {
     const planResult = await pool.query(`
-      INSERT INTO plans (name, price, max_sedes, max_users, max_spots)
+      INSERT INTO saas_plans (name, price, max_sedes, max_users, max_spots)
       VALUES ('Enterprise', 0, 999, 9999, 99999)
       RETURNING id
     `);
