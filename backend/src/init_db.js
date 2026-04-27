@@ -43,6 +43,7 @@ async function initDb() {
       subscription_start  DATE,
       subscription_end    DATE,
       plan_template       VARCHAR(50),
+      is_active           BOOLEAN DEFAULT TRUE,
       created_at          TIMESTAMP DEFAULT NOW()
     );
   `);
@@ -86,6 +87,10 @@ async function initDb() {
     BEGIN
       IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='tickets' AND column_name='user_id') THEN
         ALTER TABLE tickets RENAME COLUMN user_id TO created_by;
+      END IF;
+      
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='tenants' AND column_name='is_active') THEN
+        ALTER TABLE tenants ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
       END IF;
     END $$;
   `);

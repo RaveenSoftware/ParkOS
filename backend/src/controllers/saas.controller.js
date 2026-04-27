@@ -197,8 +197,10 @@ const SaasController = {
 
       const result = await pool.query(`
         SELECT 
-          tk.id, tk.plate, tk.type, tk.status,
-          tk.entry_at, tk.exit_at, tk.minutes_parked, tk.amount,
+          tk.id, tk.plate, tk.vehicle_type as type, tk.status,
+          tk.entry_at, tk.exit_at, 
+          EXTRACT(EPOCH FROM (COALESCE(tk.exit_at, NOW()) - tk.entry_at))/60 AS minutes_parked, 
+          tk.amount,
           s.name as sede_name,
           t.name as tenant_name,
           u.name as created_by_name

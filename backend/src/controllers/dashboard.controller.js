@@ -75,11 +75,11 @@ const DashboardController = {
 
       // 3.5. Breakdown por tipo de vehículo hoy
       const breakdownRes = await pool.query(`
-        SELECT type, COUNT(*) as count, COALESCE(SUM(amount), 0) as revenue
+        SELECT vehicle_type as type, COUNT(*) as count, COALESCE(SUM(amount), 0) as revenue
         FROM tickets
         WHERE sede_id IN (SELECT id FROM sedes WHERE tenant_id = $1)
           AND DATE(entry_at) = CURRENT_DATE
-        GROUP BY type
+        GROUP BY vehicle_type
       `, [tenantId]);
 
       // 4. Info del plan del tenant
@@ -125,8 +125,10 @@ const DashboardController = {
 
       let query = `
         SELECT
-          tk.id, tk.plate, tk.type, tk.status,
-          tk.entry_at, tk.exit_at, tk.minutes_parked, tk.amount,
+          tk.id, tk.plate, tk.vehicle_type as type, tk.status,
+          tk.entry_at, tk.exit_at, 
+          EXTRACT(EPOCH FROM (COALESCE(tk.exit_at, NOW()) - tk.entry_at))/60 AS minutes_parked, 
+          tk.amount,
           s.name AS sede_name,
           u.name AS created_by_name
         FROM tickets tk
