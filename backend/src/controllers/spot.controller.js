@@ -15,7 +15,7 @@ const SpotController = {
         SELECT 
           ps.*,
           t.plate            AS occupied_plate,
-          t.type             AS occupied_type,
+          t.vehicle_type     AS occupied_type,
           t.entry_at         AS occupied_since,
           EXTRACT(EPOCH FROM (NOW() - t.entry_at))/60 AS minutes_so_far,
           t.id               AS ticket_id,
@@ -26,18 +26,18 @@ const SpotController = {
         LEFT JOIN tickets t 
           ON t.spot_id = ps.id AND t.status = 'ABIERTO'
         LEFT JOIN subscribers sub 
-          ON sub.sede_id = ps.sede_id 
+          ON sub.plate = t.plate
+          AND sub.sede_id = ps.sede_id 
           AND sub.is_active = true
           AND sub.end_date >= NOW()
-          AND t.id IS NULL
         WHERE ps.sede_id = $1
         ORDER BY ps.row_pos, ps.col_pos
       `, [sedeId]);
 
       const spots = spotsRes.rows.map(s => ({
         ...s,
-        status: s.ticket_id     ? 'OCUPADA'
-              : s.subscriber_id ? 'ABONADO'
+        status: s.subscriber_id ? 'ABONADO'
+              : s.ticket_id     ? 'OCUPADA'
               : s.is_active === false ? 'INACTIVA'
               : 'LIBRE'
       }));

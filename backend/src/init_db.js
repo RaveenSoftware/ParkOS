@@ -128,6 +128,22 @@ async function initDb() {
           ALTER TABLE parking_spots ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
         END IF;
       END IF;
+
+      -- Migrate subscribers
+      IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='subscribers') THEN
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='subscribers' AND column_name='sede_id') THEN
+          ALTER TABLE subscribers ADD COLUMN sede_id INT REFERENCES sedes(id);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='subscribers' AND column_name='document_id') THEN
+          ALTER TABLE subscribers ADD COLUMN document_id VARCHAR(50);
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='subscribers' AND column_name='amount_paid') THEN
+          ALTER TABLE subscribers ADD COLUMN amount_paid NUMERIC(10,2) DEFAULT 0;
+        END IF;
+        IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='subscribers' AND column_name='full_name') THEN
+          ALTER TABLE subscribers RENAME COLUMN full_name TO client_name;
+        END IF;
+      END IF;
     END $$;
   `);
 
@@ -243,14 +259,17 @@ async function initDb() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS subscribers (
       id           SERIAL PRIMARY KEY,
-      tenant_id    INT REFERENCES tenants(id),
+      tenant_id    INT REFERENCES tenants(id) ON DELETE CASCADE,
+      sede_id      INT REFERENCES sedes(id) ON DELETE CASCADE,
+      client_name  VARCHAR(255) NOT NULL,
+      document_id  VARCHAR(50),
       email        VARCHAR(255),
-      full_name    VARCHAR(255),
-      plate        VARCHAR(30),
-      vehicle_type VARCHAR(30),
+      plate        VARCHAR(30) NOT NULL,
+      vehicle_type VARCHAR(30) NOT NULL,
       plan_name    VARCHAR(100),
-      start_date   DATE,
-      end_date     DATE,
+      start_date   TIMESTAMP NOT NULL,
+      end_date     TIMESTAMP NOT NULL,
+      amount_paid  NUMERIC(10,2) DEFAULT 0,
       is_active    BOOLEAN DEFAULT TRUE,
       created_at   TIMESTAMP DEFAULT NOW()
     );
