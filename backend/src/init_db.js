@@ -108,6 +108,26 @@ async function initDb() {
       IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='saas_plans' AND column_name='features') THEN
         ALTER TABLE saas_plans ADD COLUMN features JSONB DEFAULT '[]';
       END IF;
+
+      -- Migrate spots to parking_spots
+      IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='spots') THEN
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='parking_spots') THEN
+          DROP TABLE parking_spots CASCADE;
+        END IF;
+        ALTER TABLE spots RENAME TO parking_spots;
+        
+        ALTER TABLE parking_spots RENAME COLUMN label TO spot_code;
+        ALTER TABLE parking_spots RENAME COLUMN type TO spot_type;
+        ALTER TABLE parking_spots RENAME COLUMN x TO row_pos;
+        ALTER TABLE parking_spots RENAME COLUMN y TO col_pos;
+        
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='parking_spots' AND column_name='tenant_id') THEN
+          ALTER TABLE parking_spots ADD COLUMN tenant_id INT REFERENCES tenants(id) ON DELETE CASCADE;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='parking_spots' AND column_name='is_active') THEN
+          ALTER TABLE parking_spots ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
+        END IF;
+      END IF;
     END $$;
   `);
 
@@ -124,15 +144,16 @@ async function initDb() {
   `);
 
   await pool.query(`
-    CREATE TABLE IF NOT EXISTS spots (
-      id          SERIAL PRIMARY KEY,
-      sede_id     INT REFERENCES sedes(id) ON DELETE CASCADE,
-      label       VARCHAR(20) NOT NULL,
-      type        VARCHAR(30) DEFAULT 'CARRO',
-      x           INT DEFAULT 0,
-      y           INT DEFAULT 0,
-      status      VARCHAR(20) DEFAULT 'DISPONIBLE',
-      created_at  TIMESTAMP DEFAULT NOW()
+    CREATE TABLE IF NOT EXISTS parking_spots (
+      id           SERIAL PRIMARY KEY,
+      sede_id      INT REFERENCES sedes(id) ON DELETE CASCADE,
+      tenant_id    INT REFERENCES tenants(id) ON DELETE CASCADE,
+      spot_code    VARCHAR(20) NOT NULL,
+      row_pos      INT NOT NULL,
+      col_pos      INT NOT NULL,
+      spot_type    VARCHAR(30) DEFAULT 'CARRO',
+      is_active    BOOLEAN DEFAULT TRUE,
+      UNIQUE(sede_id, row_pos, col_pos)
     );
   `);
 
@@ -140,7 +161,7 @@ async function initDb() {
     CREATE TABLE IF NOT EXISTS tickets (
       id            SERIAL PRIMARY KEY,
       sede_id       INT REFERENCES sedes(id),
-      spot_id       INT REFERENCES spots(id),
+      spot_id       INT REFERENCES parking_spots(id),
       created_by    INT REFERENCES users(id),
       plate         VARCHAR(20) NOT NULL,
       vehicle_type  VARCHAR(30) DEFAULT 'CARRO',
