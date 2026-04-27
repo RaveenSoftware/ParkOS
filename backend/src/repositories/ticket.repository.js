@@ -4,7 +4,7 @@ const TicketRepository = {
   async create(plate, type, userId, sedeId, spotId, clientName, clientDoc) {
     try {
       const res = await pool.query(
-        `INSERT INTO tickets (plate, type, created_by, sede_id, spot_id, client_name, client_doc)
+        `INSERT INTO tickets (plate, vehicle_type, created_by, sede_id, spot_id, client_name, client_doc)
          VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
         [plate.toUpperCase(), type, userId, sedeId, spotId || null, clientName || null, clientDoc || null]
       );
