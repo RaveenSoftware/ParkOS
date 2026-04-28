@@ -105,6 +105,9 @@ async function initDb() {
       IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='tenants' AND column_name='phone') THEN
         ALTER TABLE tenants ADD COLUMN phone VARCHAR(50);
       END IF;
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='tickets' AND column_name='minutes_parked') THEN
+        ALTER TABLE tickets ADD COLUMN minutes_parked INT;
+      END IF;
       IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='saas_plans' AND column_name='features') THEN
         ALTER TABLE saas_plans ADD COLUMN features JSONB DEFAULT '[]';
       END IF;
@@ -183,6 +186,7 @@ async function initDb() {
       vehicle_type  VARCHAR(30) DEFAULT 'CARRO',
       entry_at      TIMESTAMP DEFAULT NOW(),
       exit_at       TIMESTAMP,
+      minutes_parked INT,
       amount        NUMERIC(10,2),
       status        VARCHAR(20) DEFAULT 'ABIERTO',
       client_name   VARCHAR(255),
