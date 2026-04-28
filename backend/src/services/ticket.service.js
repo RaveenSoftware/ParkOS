@@ -56,11 +56,11 @@ const TicketService = {
     // Obtener tarifas personalizadas
     const ratesRes = await pool.query(
       'SELECT rate_type, amount, min_charge FROM parking_rates WHERE tenant_id = $1 AND vehicle_type = $2',
-      [tenantId, ticket.type]
+      [tenantId, ticket.vehicle_type]
     );
 
-    let rateHora = DEFAULT_RATES[ticket.type]?.POR_HORA || 0;
-    let rateMinimo = DEFAULT_RATES[ticket.type]?.MINIMO || 0;
+    let rateHora = DEFAULT_RATES[ticket.vehicle_type]?.POR_HORA || 0;
+    let rateMinimo = DEFAULT_RATES[ticket.vehicle_type]?.MINIMO || 0;
 
     for (const r of ratesRes.rows) {
       if (r.rate_type === 'POR_HORA') rateHora = parseFloat(r.amount);
