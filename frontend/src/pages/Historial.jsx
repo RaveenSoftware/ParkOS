@@ -86,12 +86,12 @@ export default function Historial() {
               key={ticket.id}
               className="bg-[#1a1f2e] border border-white/5 rounded-2xl px-6 py-4 flex items-center gap-5 hover:border-white/10 transition-all"
             >
-              <span className="text-3xl shrink-0">{TYPE_ICON[ticket.type] ?? '🚗'}</span>
+              <span className="text-3xl shrink-0">{TYPE_ICON[ticket.vehicle_type] ?? '🚗'}</span>
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="text-white font-black text-lg tracking-widest">{ticket.plate}</span>
-                  <span className="text-[10px] bg-white/5 text-gray-400 px-2 py-0.5 rounded font-bold">{ticket.type}</span>
+                  <span className="text-[10px] bg-white/5 text-gray-400 px-2 py-0.5 rounded font-bold">{ticket.vehicle_type}</span>
                   {ticket.invoice_num && (
                     <span className="text-[10px] text-indigo-400/70 font-mono">{ticket.invoice_num.substring(0, 20)}…</span>
                   )}

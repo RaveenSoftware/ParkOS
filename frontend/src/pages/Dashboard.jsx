@@ -79,10 +79,10 @@ export default function Dashboard() {
             <p className="text-center text-gray-500 py-12 text-sm">Sin actividad aún</p>
           ) : recent.map(t => (
             <div key={t.id} className="flex items-center gap-4 px-6 py-4">
-              <div className={`w-2 h-2 rounded-full ${TYPE_COLOR[t.type] ?? 'bg-gray-500'}`} />
+              <div className={`w-2 h-2 rounded-full ${TYPE_COLOR[t.vehicle_type] ?? 'bg-gray-500'}`} />
               <div className="flex-1">
                 <span className="text-white font-bold text-sm">{t.plate}</span>
-                <span className="text-gray-500 text-xs ml-3">{t.type}</span>
+                <span className="text-gray-500 text-xs ml-3">{t.vehicle_type}</span>
               </div>
               <span className={`text-xs font-bold px-2 py-1 rounded-lg ${t.status === 'ABIERTO' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-gray-500/15 text-gray-400'}`}>
                 {t.status}

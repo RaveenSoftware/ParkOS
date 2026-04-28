@@ -40,7 +40,7 @@ function CheckoutModal({ ticket, onClose, onConfirm, checkingOut }) {
         </div>
         <div className="px-6 py-5 space-y-5">
           <div className="text-center">
-            <span className="text-4xl">{TYPE_ICON[ticket.type] ?? '🚗'}</span>
+            <span className="text-4xl">{TYPE_ICON[ticket.vehicle_type] ?? '🚗'}</span>
             <p className="text-white font-black text-2xl tracking-widest mt-2">{ticket.plate}</p>
             <p className="text-gray-400 text-xs">
               Tiempo: {formatMinutes(ticket.minutes_so_far)}
@@ -162,12 +162,12 @@ export default function Tickets() {
         <div className="space-y-3">
           {filtered.map(ticket => (
             <div key={ticket.id} className="bg-[#1a1f2e] border border-white/5 rounded-2xl px-6 py-5 flex items-center gap-6 hover:border-indigo-500/30 transition-all">
-              <span className="text-3xl">{TYPE_ICON[ticket.type] ?? '🚗'}</span>
+              <span className="text-3xl">{TYPE_ICON[ticket.vehicle_type] ?? '🚗'}</span>
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-3 flex-wrap">
                   <span className="text-white font-black text-xl tracking-widest">{ticket.plate}</span>
-                  <span className="text-[10px] bg-white/5 text-gray-400 px-2 py-1 rounded-lg font-bold">{ticket.type}</span>
+                  <span className="text-[10px] bg-white/5 text-gray-400 px-2 py-1 rounded-lg font-bold">{ticket.vehicle_type}</span>
                   {ticket.spot_code && (
                     <span className="text-[10px] bg-indigo-500/10 text-indigo-400 px-2 py-1 rounded-lg font-bold border border-indigo-500/20">
                       🅿️ {ticket.spot_code}
@@ -181,7 +181,7 @@ export default function Tickets() {
               </div>
 
               <div className="text-right">
-                <p className="text-amber-400 font-black text-lg">{estimate(ticket.type, ticket.minutes_so_far)}</p>
+                <p className="text-amber-400 font-black text-lg">{estimate(ticket.vehicle_type, ticket.minutes_so_far)}</p>
                 <p className="text-gray-500 text-xs">{formatMinutes(ticket.minutes_so_far)}</p>
               </div>
 
