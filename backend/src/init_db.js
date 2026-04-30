@@ -130,6 +130,7 @@ async function initDb() {
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='parking_spots' AND column_name='is_active') THEN
           ALTER TABLE parking_spots ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
         END IF;
+        END IF;
       END IF;
 
       -- Migrate subscribers
@@ -145,6 +146,18 @@ async function initDb() {
         END IF;
         IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='subscribers' AND column_name='full_name') THEN
           ALTER TABLE subscribers RENAME COLUMN full_name TO client_name;
+        END IF;
+      END IF;
+
+      -- Ensure unique constraint on parking_spots (Required for ON CONFLICT)
+      IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name='parking_spots') THEN
+        IF NOT EXISTS (
+          SELECT 1 FROM pg_constraint c 
+          JOIN pg_class t ON c.conrelid = t.oid 
+          WHERE t.relname = 'parking_spots' AND c.contype = 'u' 
+          AND (SELECT array_agg(a.attname ORDER BY x) FROM unnest(c.conkey) WITH ORDINALITY AS x(cid, x) JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = cid) @> ARRAY['sede_id', 'row_pos', 'col_pos']
+        ) THEN
+          ALTER TABLE parking_spots ADD CONSTRAINT parking_spots_sede_id_row_pos_col_pos_key UNIQUE(sede_id, row_pos, col_pos);
         END IF;
       END IF;
     END $$;
