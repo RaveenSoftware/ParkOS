@@ -78,30 +78,77 @@ const SpotController = {
 
   // PUT /api/spots/layout - Guardar layout completo (batch)
   async saveLayout(req, res) {
+    const client = await pool.connect();
     try {
       const { tenantId } = req.user;
       const { sede_id, spots } = req.body;
 
-      const sedeCheck = await pool.query('SELECT id FROM sedes WHERE id=$1 AND tenant_id=$2', [sede_id, tenantId]);
+      const sedeCheck = await client.query('SELECT id FROM sedes WHERE id=$1 AND tenant_id=$2', [sede_id, tenantId]);
       if (!sedeCheck.rows[0]) return res.status(403).json({ error: 'Sede no autorizada' });
 
       if (!Array.isArray(spots)) return res.status(400).json({ error: 'spots debe ser un arreglo' });
 
-      // Eliminar spots existentes de la sede y reemplazar con los nuevos
-      await pool.query('DELETE FROM parking_spots WHERE sede_id = $1 AND tenant_id = $2', [sede_id, tenantId]);
+      await client.query('BEGIN');
 
-      if (spots.length > 0) {
-        const values = spots.map((s, i) => `($${i * 6 + 1}, $${i * 6 + 2}, $${i * 6 + 3}, $${i * 6 + 4}, $${i * 6 + 5}, $${i * 6 + 6})`).join(', ');
-        const params = spots.flatMap(s => [sede_id, tenantId, s.spot_code, s.row_pos, s.col_pos, s.spot_type || 'CARRO']);
-        await pool.query(`
-          INSERT INTO parking_spots (sede_id, tenant_id, spot_code, row_pos, col_pos, spot_type)
-          VALUES ${values}
-        `, params);
+      // 1. Marcar todos los spots actuales de esta sede como "inactivos" temporalmente
+      // o simplemente confiar en el upsert y luego limpiar.
+      
+      const processedIds = [];
+
+      // 2. Upsert de los spots recibidos
+      for (const s of spots) {
+        const result = await client.query(`
+          INSERT INTO parking_spots (sede_id, tenant_id, spot_code, row_pos, col_pos, spot_type, is_active)
+          VALUES ($1, $2, $3, $4, $5, $6, TRUE)
+          ON CONFLICT (sede_id, row_pos, col_pos) DO UPDATE
+            SET spot_code = EXCLUDED.spot_code,
+                spot_type = EXCLUDED.spot_type,
+                is_active = TRUE
+          RETURNING id
+        `, [sede_id, tenantId, s.spot_code || `${s.row_pos}-${s.col_pos}`, s.row_pos, s.col_pos, s.spot_type || 'CARRO']);
+        processedIds.push(result.rows[0].id);
       }
 
+      // 3. Los spots que estaban en la DB pero NO en la lista nueva:
+      //    a. Si NO tienen tickets, los borramos.
+      //    b. Si TIENEN tickets, los marcamos como is_active = FALSE (para no romper historial).
+      
+      if (processedIds.length > 0) {
+        // Borrar los que no tienen tickets
+        await client.query(`
+          DELETE FROM parking_spots 
+          WHERE sede_id = $1 AND tenant_id = $2 AND id NOT IN (${processedIds.join(',')})
+          AND NOT EXISTS (SELECT 1 FROM tickets WHERE spot_id = parking_spots.id)
+        `, [sede_id, tenantId]);
+
+        // Desactivar los que sí tienen tickets
+        await client.query(`
+          UPDATE parking_spots 
+          SET is_active = FALSE 
+          WHERE sede_id = $1 AND tenant_id = $2 AND id NOT IN (${processedIds.join(',')})
+          AND EXISTS (SELECT 1 FROM tickets WHERE spot_id = parking_spots.id)
+        `, [sede_id, tenantId]);
+      } else {
+        // Si mandaron lista vacía, intentar borrar todos los que no tengan tickets
+        await client.query(`
+          DELETE FROM parking_spots 
+          WHERE sede_id = $1 AND tenant_id = $2
+          AND NOT EXISTS (SELECT 1 FROM tickets WHERE spot_id = parking_spots.id)
+        `, [sede_id, tenantId]);
+        
+        await client.query(`
+          UPDATE parking_spots SET is_active = FALSE 
+          WHERE sede_id = $1 AND tenant_id = $2
+        `);
+      }
+
+      await client.query('COMMIT');
       res.json({ success: true, count: spots.length });
     } catch (err) {
+      await client.query('ROLLBACK');
       res.status(500).json({ error: err.message });
+    } finally {
+      client.release();
     }
   },
 
