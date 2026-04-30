@@ -130,7 +130,6 @@ async function initDb() {
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='parking_spots' AND column_name='is_active') THEN
           ALTER TABLE parking_spots ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
         END IF;
-        END IF;
       END IF;
 
       -- Migrate subscribers
