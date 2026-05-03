@@ -95,6 +95,7 @@ const ExpenseController = {
 
       query += ' ORDER BY e.created_at DESC LIMIT 500';
       const result = await pool.query(query, params);
+      res.set('Cache-Control', 'no-store');
       res.json(result.rows);
     } catch (err) {
       res.status(500).json({ error: err.message });
