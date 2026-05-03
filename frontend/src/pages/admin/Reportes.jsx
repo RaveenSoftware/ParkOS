@@ -142,7 +142,7 @@ export default function AdminReportes() {
           <div className="w-8 h-8 rounded-full border-2 border-white/10 border-t-indigo-400 animate-spin" />
         </div>
       ) : (
-        <div className="bg-[#1a1f2e] border border-white/5 rounded-2xl overflow-hidden">
+        <div className="bg-[#1a1f2e] border border-white/5 rounded-2xl">
           <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
             <p className="text-white font-bold text-sm">Detalle de Transacciones</p>
             <span className="text-white/20 text-xs">{tickets.length} registros</span>

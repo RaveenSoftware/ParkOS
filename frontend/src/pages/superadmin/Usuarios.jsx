@@ -94,7 +94,8 @@ export default function SuperAdminUsuarios() {
           <div className="w-6 h-6 rounded-full border-2 border-white/10 border-t-blue-400 animate-spin" />
         </div>
       ) : (
-        <div className="bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden">
+        <div className="bg-white/[0.03] border border-white/10 rounded-xl">
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/10">
@@ -146,6 +147,7 @@ export default function SuperAdminUsuarios() {
               )}
             </tbody>
           </table>
+          </div>
           <div className="px-5 py-3 border-t border-white/5 flex items-center justify-between">
             <span className="text-white/20 text-xs">{filtered.length} de {users.length} usuarios</span>
           </div>

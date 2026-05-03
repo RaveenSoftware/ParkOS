@@ -310,11 +310,12 @@ export default function SuperAdminDashboard() {
       </div>
 
       {/* Últimas altas */}
-      <div className="bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden">
+      <div className="bg-white/[0.03] border border-white/10 rounded-xl">
         <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
           <h3 className="text-white font-bold text-sm">Últimas Altas</h3>
           <span className="text-white/20 text-xs">5 más recientes</span>
         </div>
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-white/5">
@@ -355,6 +356,7 @@ export default function SuperAdminDashboard() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );
