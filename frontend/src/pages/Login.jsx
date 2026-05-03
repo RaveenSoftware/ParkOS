@@ -82,7 +82,7 @@ export default function Login() {
             <div 
               className="absolute inset-0 bg-cover bg-center transition-transform duration-[10000ms] ease-linear"
               style={{ 
-                backgroundImage: \`url('\${slide.img}')\`,
+                backgroundImage: `url('${slide.img}')`,
                 transform: index === currentSlide ? 'scale(1.05)' : 'scale(1)'
               }}
             />
