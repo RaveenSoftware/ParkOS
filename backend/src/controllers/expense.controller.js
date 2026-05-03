@@ -65,7 +65,7 @@ const ExpenseController = {
       const result = await pool.query(`
         INSERT INTO cash_expenses (tenant_id, sede_id, user_id, description, amount, category)
         VALUES ($1, $2, $3, $4, $5, $6) RETURNING *
-      `, [tenantId, sedeId, userId, description, amount, category || 'OTRO']);
+      `, [tenantId, sedeId, (userId && userId > 0) ? userId : null, description, amount, category || 'OTRO']);
 
       res.status(201).json(result.rows[0]);
     } catch (err) {
