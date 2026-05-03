@@ -88,7 +88,7 @@ export default function Entrada() {
         sedeName: spots[0]?.sede_name || '',
         ticketId: ticket.id,
         plate: ticket.plate,
-        vehicleType: ticket.type,
+        vehicleType: ticket.vehicle_type,
         entryTime: ticket.entry_at,
         spotCode: selectedSpot ? selectedSpot.spot_code : '',
         clientName: ticket.client_name,
@@ -129,7 +129,7 @@ export default function Entrada() {
               <p className="text-emerald-400 font-black text-lg">Entrada registrada exitosamente</p>
               <p className="text-white font-black text-2xl tracking-widest mt-1">{success.plate}</p>
               <p className="text-gray-400 text-sm mt-1">
-                Ticket #{success.id} · {success.type} · {new Date(success.entry_at).toLocaleTimeString('es-CO')}
+                Ticket #{success.id} · {success.vehicle_type} · {new Date(success.entry_at).toLocaleTimeString('es-CO')}
                 {success.spot_id && <span className="ml-2 text-indigo-400">· Plaza asignada</span>}
               </p>
               {(success.client_name || success.client_doc) && (

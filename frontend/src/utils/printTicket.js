@@ -3,6 +3,7 @@ export function printTicket(data) {
     type, // 'ENTRY' | 'EXIT'
     tenantName = 'ParkOS',
     tenantDoc = '',
+    tenantAddress = '',
     sedeName = '',
     ticketId,
     plate,
@@ -27,79 +28,93 @@ export function printTicket(data) {
           @page { margin: 0; size: 80mm auto; }
           body {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
+            font-size: 13px;
             color: #000;
             width: 80mm;
-            padding: 5mm;
+            padding: 2mm 5mm;
             margin: 0 auto;
             text-align: center;
           }
-          h1 { font-size: 16px; margin: 0 0 5px 0; }
-          h2 { font-size: 14px; margin: 0 0 5px 0; }
-          .divider { border-bottom: 1px dashed #000; margin: 10px 0; }
+          h1 { font-size: 24px; margin: 0 0 5px 0; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+          .header-info { font-size: 11px; margin-bottom: 2px; }
+          h2 { font-size: 16px; margin: 0; padding: 5px 0; border-top: 1px dashed #000; border-bottom: 1px dashed #000; }
+          .divider { border-bottom: 1px dashed #000; margin: 8px 0; }
           .left { text-align: left; }
           .right { text-align: right; }
           .center { text-align: center; }
-          .row { display: flex; justify-content: space-between; margin-bottom: 3px; }
+          .row { display: flex; justify-content: space-between; margin-bottom: 4px; }
           .bold { font-weight: bold; }
-          .plate { font-size: 24px; font-weight: bold; border: 2px solid #000; padding: 5px; margin: 10px 0; }
+          .plate { 
+            font-size: 32px; 
+            font-weight: 900; 
+            border: 2px solid #000; 
+            padding: 8px 0; 
+            margin: 12px 0; 
+            border-radius: 4px;
+            letter-spacing: 3px;
+          }
+          .footer-msg { font-size: 12px; font-weight: bold; margin-top: 15px; }
         </style>
       </head>
       <body>
         <h1>${tenantName}</h1>
-        ${tenantDoc ? `<div>NIT/RUT: ${tenantDoc}</div>` : ''}
-        ${sedeName ? `<div>Sede: ${sedeName}</div>` : ''}
+        ${tenantDoc ? `<div class="header-info">NIT: ${tenantDoc}</div>` : ''}
+        ${tenantAddress ? `<div class="header-info">Dirección: ${tenantAddress}</div>` : ''}
+        ${sedeName ? `<div class="header-info">Sede: ${sedeName}</div>` : ''}
         
-        <div class="divider"></div>
+        <div style="margin-top: 10px;"></div>
         
         <h2>TICKET DE ${type === 'ENTRY' ? 'ENTRADA' : 'SALIDA'}</h2>
-        <div>Ticket #${ticketId}</div>
+        <div style="margin-top: 5px; font-size: 14px;">Ticket #${ticketId}</div>
         
         <div class="plate">${plate}</div>
         
         <div class="row">
-          <span class="left">Tipo:</span>
-          <span class="right">${vehicleType}</span>
+          <span class="left">Tipo de vehículo:</span>
+          <span class="right bold">${vehicleType || 'NO ASIGNADO'}</span>
         </div>
         ${spotCode ? `
         <div class="row">
-          <span class="left">Plaza:</span>
+          <span class="left">Plaza asignada:</span>
           <span class="right bold">${spotCode}</span>
         </div>` : ''}
         
         <div class="divider"></div>
         
         <div class="row">
-          <span class="left">Entrada:</span>
-          <span class="right">${new Date(entryTime).toLocaleString('es-CO')}</span>
+          <span class="left">Hora Entrada:</span>
+          <span class="right">${new Date(entryTime).toLocaleString('es-CO', { hour12: true, month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
         </div>
         
         ${type === 'EXIT' ? `
         <div class="row">
-          <span class="left">Salida:</span>
-          <span class="right">${new Date(exitTime).toLocaleString('es-CO')}</span>
+          <span class="left">Hora Salida:</span>
+          <span class="right">${new Date(exitTime).toLocaleString('es-CO', { hour12: true, month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
         </div>
         <div class="row">
-          <span class="left">Tiempo:</span>
+          <span class="left">Tiempo total:</span>
           <span class="right">${duration}</span>
         </div>
         <div class="divider"></div>
-        <div class="row bold" style="font-size: 16px;">
-          <span class="left">TOTAL:</span>
+        <div class="row bold" style="font-size: 18px; margin-top: 8px;">
+          <span class="left">TOTAL A PAGAR:</span>
           <span class="right">${amount}</span>
         </div>
         ` : ''}
 
         ${(clientName || clientDoc) ? `
         <div class="divider"></div>
-        <div class="left bold">Datos del Cliente:</div>
+        <div class="left bold" style="margin-bottom: 4px;">Datos del Cliente:</div>
         ${clientName ? `<div class="left">Nombre: ${clientName}</div>` : ''}
-        ${clientDoc ? `<div class="left">Doc: ${clientDoc}</div>` : ''}
+        ${clientDoc ? `<div class="left">CC/NIT: ${clientDoc}</div>` : ''}
         ` : ''}
         
         <div class="divider"></div>
-        <div>Conserve este ticket para su salida.</div>
-        <div style="margin-top: 10px;">¡Gracias por su visita!</div>
+        
+        <div class="footer-msg">Conserve este ticket para su salida.</div>
+        <div class="footer-msg" style="margin-top: 5px;">¡Gracias por su visita!</div>
+        
+        <div style="margin-top: 20px;">-</div>
       </body>
       <script>
         window.onload = function() {
