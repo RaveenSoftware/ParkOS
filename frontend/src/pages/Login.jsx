@@ -4,8 +4,8 @@ import { api } from '../api/client';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('admin@parkos.com');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -80,7 +80,7 @@ export default function Login() {
                 onChange={e => setEmail(e.target.value)}
                 required
                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-indigo-500 focus:bg-white/8 transition-all"
-                placeholder="admin@parkos.com"
+                placeholder="correo@empresa.com"
               />
             </div>
             <div>
@@ -109,11 +109,9 @@ export default function Login() {
               {loading ? 'Verificando...' : 'Entrar al Sistema →'}
             </button>
           </form>
-
-          <p className="text-center text-gray-600 text-xs mt-8">
-            admin@parkos.com · admin123
-          </p>
         </div>
+
+
       </div>
     </div>
   );
