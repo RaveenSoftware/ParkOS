@@ -39,7 +39,8 @@ export default function Entrada() {
   const [success, setSuccess] = useState(null);
   const [error,   setError]   = useState('');
 
-  const sedeId = user.sedeId;
+  // Para ADMIN_TENANT y SUPERADMIN, la sede se selecciona en el Sidebar y se guarda en parkos_pos_sedeId
+  const sedeId = localStorage.getItem('parkos_pos_sedeId') || user.sedeId;
 
   const loadSpots = useCallback(async () => {
     if (!sedeId) return;

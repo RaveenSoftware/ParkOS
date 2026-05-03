@@ -14,16 +14,23 @@ const TYPE_ICONS = {
 
 function formatTime(mins) {
   if (mins === undefined || mins === null || mins < 0) return '';
-  const diff = Math.floor(mins);
-  if (diff < 60) return `${diff}min`;
-  const h = Math.floor(diff / 60);
-  const m = diff % 60;
-  return `${h}h ${m}m`;
+  const totalSecs = Math.floor(mins * 60);
+  const d = Math.floor(totalSecs / 86400);
+  const h = Math.floor((totalSecs % 86400) / 3600);
+  const m = Math.floor((totalSecs % 3600) / 60);
+  const s = totalSecs % 60;
+  const parts = [];
+  if (d > 0) parts.push(`${d}d`);
+  if (h > 0) parts.push(`${h}h`);
+  if (m > 0) parts.push(`${m}m`);
+  if (s > 0 || parts.length === 0) parts.push(`${s}s`);
+  return parts.join(' ');
 }
 
 export default function MapaPOS() {
   const user = (() => { try { return JSON.parse(localStorage.getItem('parkos_user') || '{}'); } catch { return {}; } })();
-  const sedeId = user.sedeId;
+  // Para ADMIN_TENANT y SUPERADMIN, la sede se selecciona en el Sidebar y se guarda en parkos_pos_sedeId
+  const sedeId = localStorage.getItem('parkos_pos_sedeId') || user.sedeId;
 
   const [spots, setSpots] = useState([]);
   const [maxRow, setMaxRow] = useState(0);
