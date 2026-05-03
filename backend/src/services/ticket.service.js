@@ -67,9 +67,24 @@ const TicketService = {
       if (r.rate_type === 'MINIMO') rateMinimo = parseFloat(r.amount);
     }
 
-    // Cálculo básico (simplificado por ahora: cobra por hora o fracción + valida mínimo)
-    const calculated = hours * rateHora;
-    const amount = Math.max(calculated, rateMinimo);
+    // Cálculo de tarifa
+    let amount = 0;
+    if (minutes > 0) {
+      const h = Math.floor(minutes / 60);
+      const extraMins = minutes % 60;
+
+      if (h === 0) {
+        // Menos de una hora: cobra la fracción/mínimo
+        amount = rateMinimo;
+      } else {
+        // 1 hora o más
+        amount = h * rateHora;
+        if (extraMins > 0) {
+          // Fracción adicional por pasarse de la hora
+          amount += rateMinimo;
+        }
+      }
+    }
 
     // Generar número de factura único: INV-SEDE-FECHA-RANDOM
     const invoiceNum = `INV-${sedeId}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
