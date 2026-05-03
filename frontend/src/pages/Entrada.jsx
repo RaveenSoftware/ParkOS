@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
+import { printTicket } from '../utils/printTicket';
 
 const TYPES = [
   { value: 'CARRO',     label: 'Carro',     icon: '🚗', desc: 'Automóvil / camioneta' },
@@ -79,6 +80,20 @@ export default function Entrada() {
       setClientDoc('');
       setSpotId(null);
       loadSpots(); // refresh map
+      
+      // Print Ticket
+      printTicket({
+        type: 'ENTRY',
+        tenantName: user.tenant_name || 'ParkOS',
+        sedeName: spots[0]?.sede_name || '',
+        ticketId: ticket.id,
+        plate: ticket.plate,
+        vehicleType: ticket.type,
+        entryTime: ticket.entry_at,
+        spotCode: selectedSpot ? selectedSpot.spot_code : '',
+        clientName: ticket.client_name,
+        clientDoc: ticket.client_doc
+      });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -253,7 +268,7 @@ export default function Entrada() {
 
               <button
                 type="submit"
-                disabled={loading || !plate.trim()}
+                disabled={loading || !plate.trim() || (!spotId && spots.length > 0 && !noMap)}
                 className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white font-black py-4 rounded-xl transition-all text-sm tracking-wide shadow-lg shadow-indigo-600/30"
               >
                 {loading ? '⏳ Registrando...' : '🚗 Registrar Entrada'}

@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
+import { printTicket } from '../utils/printTicket';
 
-const TYPE_ICON  = { CARRO: '🚗', MOTO: '🏍️', BICICLETA: '🚲' };
-const RATES      = { CARRO: 100, MOTO: 60, BICICLETA: 30 };
-const MIN_CHARGE = { CARRO: 1000, MOTO: 600, BICICLETA: 300 };
+const TYPE_ICON  = { CARRO: '🚗', MOTO: '🏍️', BICICLETA: '🚲', CAMION: '🚛' };
+const RATES      = { CARRO: 100, MOTO: 60, BICICLETA: 30, CAMION: 200 };
+const MIN_CHARGE = { CARRO: 1000, MOTO: 600, BICICLETA: 300, CAMION: 2000 };
 
 function formatCOP(n) {
   return Number(n).toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 });
@@ -28,7 +29,10 @@ function formatDuration(mins) {
 
 function estimate(type, mins) {
   if (!mins || mins < 0) mins = 0;
-  const amt = Math.max(mins * RATES[type], MIN_CHARGE[type]);
+  const rate = RATES[type] || RATES['CARRO'];
+  const min = MIN_CHARGE[type] || MIN_CHARGE['CARRO'];
+  const amt = Math.max(mins * rate, min);
+  if (Number.isNaN(amt)) return '$ 0';
   return formatCOP(amt);
 }
 
@@ -138,6 +142,23 @@ export default function Tickets() {
       const result = await api.post(`/tickets/${selectedTicket.id}/checkout`, billingData);
       const dur = formatDuration(result.minutes_parked);
       showToast(`Cobrado: ${formatCOP(result.amount)} · Tiempo: ${dur}`, 'success');
+      
+      const user = (() => { try { return JSON.parse(localStorage.getItem('parkos_user') || '{}'); } catch { return {}; } })();
+      printTicket({
+        type: 'EXIT',
+        tenantName: user.tenant_name || 'ParkOS',
+        ticketId: result.id,
+        plate: result.plate,
+        vehicleType: result.vehicle_type,
+        entryTime: result.entry_at,
+        exitTime: result.exit_at,
+        duration: dur,
+        amount: formatCOP(result.amount),
+        spotCode: result.spot_code || selectedTicket.spot_code,
+        clientName: result.client_name,
+        clientDoc: result.client_doc
+      });
+      
       setSelectedTicket(null);
       load();
     } catch (err) {
