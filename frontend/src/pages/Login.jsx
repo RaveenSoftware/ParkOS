@@ -11,11 +11,11 @@ export default function Login() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
-    { img: '/Slide1.png' },
-    { img: '/Slide2.png' },
-    { img: '/Slide3.png' },
-    { img: '/Slide4.png' },
-    { img: '/Slide5.png' }
+    { img: '/slide1.png' },
+    { img: '/slide2.png' },
+    { img: '/slide3.png' },
+    { img: '/slide4.png' },
+    { img: '/slide5.png' }
   ];
 
   useEffect(() => {
