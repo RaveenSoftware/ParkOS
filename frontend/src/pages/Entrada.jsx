@@ -311,21 +311,21 @@ export default function Entrada() {
                 </p>
               </div>
             ) : (
-              <div className="flex-1 overflow-auto">
+              <div className="overflow-auto max-h-72">
                 <div
-                  className="inline-grid gap-1.5"
-                  style={{ gridTemplateColumns: `repeat(${maxCol + 1}, minmax(0, 1fr))` }}
+                  className="grid gap-1"
+                  style={{ gridTemplateColumns: `repeat(${maxCol + 1}, 3rem)`, width: 'max-content' }}
                 >
                   {Array.from({ length: maxRow + 1 }, (_, row) =>
                     Array.from({ length: maxCol + 1 }, (_, col) => {
                       const key = `${row}_${col}`;
                       const spot = spotMap[key];
-                      if (!spot) return <div key={key} className="w-14 h-14" />;
+                      if (!spot) return <div key={key} className="w-12 h-12" />;
 
                       if (spot.spot_type === 'BLOQUE') {
                         return (
-                          <div key={key} className="w-14 h-14 rounded-lg bg-white/3 border border-white/5 flex items-center justify-center">
-                            <span className="text-white/10 text-base">🧱</span>
+                          <div key={key} className="w-12 h-12 rounded-lg bg-white/3 border border-white/5 flex items-center justify-center">
+                            <span className="text-white/10 text-sm">🧱</span>
                           </div>
                         );
                       }
@@ -348,7 +348,7 @@ export default function Entrada() {
                               ? `Abonado: ${spot.subscriber_name || ''}`
                               : spot.spot_code
                           }
-                          className={`w-14 h-14 rounded-lg border-2 flex flex-col items-center justify-center transition-all ${
+                          className={`w-12 h-12 rounded-lg border-2 flex flex-col items-center justify-center transition-all ${
                             isSelected
                               ? 'border-indigo-400 bg-indigo-400/25 scale-105 shadow-lg shadow-indigo-500/30'
                               : isLibre
@@ -362,21 +362,21 @@ export default function Entrada() {
                           }
                         >
                           <span
-                            className="text-[9px] font-black uppercase tracking-widest leading-none"
+                            className="text-[8px] font-black uppercase tracking-widest leading-none"
                             style={{ color: isSelected ? '#a5b4fc' : cfg.text }}
                           >
                             {spot.spot_code}
                           </span>
                           {spot.status === 'OCUPADA' ? (
-                            <span className="text-[7px] text-red-300/70 leading-none mt-0.5 max-w-full px-0.5 truncate">
+                            <span className="text-[6px] text-red-300/70 leading-none mt-0.5 max-w-full px-0.5 truncate">
                               {spot.occupied_plate}
                             </span>
                           ) : (
-                            <span className="text-xs mt-0.5">
-                              {spot.spot_type === 'CARRO'     ? '🚗'
-                             : spot.spot_type === 'MOTO'      ? '🏍️'
-                             : spot.spot_type === 'BICICLETA' ? '🚲'
-                             : spot.spot_type === 'CAMION'    ? '🚛'
+                            <span className="text-[10px] mt-0.5">
+                              {spot.spot_type === 'CARRO'         ? '🚗'
+                             : spot.spot_type === 'MOTO'          ? '🏍️'
+                             : spot.spot_type === 'BICICLETA'     ? '🚲'
+                             : spot.spot_type === 'CAMION'        ? '🚛'
                              : spot.spot_type === 'DISCAPACITADO' ? '♿'
                              : '🅿️'}
                             </span>
