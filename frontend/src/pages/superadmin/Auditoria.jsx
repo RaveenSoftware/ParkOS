@@ -52,7 +52,7 @@ export default function SuperAdminAuditoria() {
     .reduce((a, t) => a + Number(t.amount || 0), 0);
 
   return (
-    <div className="p-8 space-y-6 max-w-[1400px]">
+    <div className="p-4 md:p-8 space-y-5 md:space-y-6 max-w-[1400px]">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>

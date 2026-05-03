@@ -102,7 +102,7 @@ export default function AdminTarifas() {
   );
 
   return (
-    <div className="p-8 max-w-[1400px]">
+    <div className="p-4 md:p-8 max-w-[1400px]">
       <div className="mb-8">
         <h1 className="text-3xl font-black text-white tracking-tight">Estructura de Tarifas</h1>
         <p className="text-white/40 text-sm mt-1 max-w-2xl">

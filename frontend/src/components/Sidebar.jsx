@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../api/client';
 
 const NAV = [
@@ -12,15 +12,18 @@ const NAV = [
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [config, setConfig] = useState(null);
   const [sedes, setSedes] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
   const user = JSON.parse(localStorage.getItem('parkos_user') || '{}');
   const [selectedSede, setSelectedSede] = useState(localStorage.getItem('parkos_pos_sedeId') || '');
 
+  // Close menu on route change (mobile)
+  useEffect(() => { setIsOpen(false); }, [location.pathname]);
+
   useEffect(() => {
-    api.get('/config').then(data => {
-      if (data) setConfig(data);
-    }).catch(() => {});
+    api.get('/config').then(data => { if (data) setConfig(data); }).catch(() => {});
 
     if (user.role === 'ADMIN_TENANT' || user.role === 'SUPERADMIN') {
       api.get('/sedes').then(data => {
@@ -43,11 +46,8 @@ export default function Sidebar() {
   function handleSedeChange(e) {
     const val = e.target.value;
     setSelectedSede(val);
-    if (val) {
-      localStorage.setItem('parkos_pos_sedeId', val);
-    } else {
-      localStorage.removeItem('parkos_pos_sedeId');
-    }
+    if (val) localStorage.setItem('parkos_pos_sedeId', val);
+    else localStorage.removeItem('parkos_pos_sedeId');
     window.location.reload();
   }
 
@@ -56,36 +56,31 @@ export default function Sidebar() {
     navigate('/login');
   }
 
-  return (
-    <aside className="w-64 min-h-screen bg-[#111827] flex flex-col border-r border-white/5">
+  const sidebarContent = (
+    <aside className="w-64 h-full bg-[#111827] flex flex-col border-r border-white/5">
       {/* Logo */}
-      <div className="p-6 border-b border-white/5">
+      <div className="p-6 border-b border-white/5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-sm overflow-hidden shrink-0">
             {config?.logo_base64 ? (
               <img src={config.logo_base64} alt="Logo" className="w-full h-full object-cover" />
-            ) : (
-              'P'
-            )}
+            ) : 'P'}
           </div>
           <div className="overflow-hidden">
             <p className="text-white font-black text-sm tracking-tight truncate">{config?.commercial_name || user.tenantName || 'ParkOS'}</p>
-            <p className="text-indigo-400 text-[10px] font-bold uppercase tracking-widest truncate">Estación de Control</p>
+            <p className="text-indigo-400 text-[10px] font-bold uppercase tracking-widest">Estación de Control</p>
           </div>
         </div>
+        {/* Mobile close button */}
+        <button className="md:hidden text-white/40 hover:text-white p-1" onClick={() => setIsOpen(false)}>✕</button>
       </div>
 
-      {/* Selector de Sede para Admins */}
+      {/* Selector de Sede */}
       {(user.role === 'ADMIN_TENANT' || user.role === 'SUPERADMIN') && (
         <div className="px-6 py-3 border-b border-white/5 bg-white/5">
-          <label className="text-gray-400 text-[10px] font-bold uppercase tracking-widest block mb-1">
-            Operando Sede
-          </label>
-          <select
-            value={selectedSede}
-            onChange={handleSedeChange}
-            className="w-full bg-black border border-white/10 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none focus:border-indigo-500"
-          >
+          <label className="text-gray-400 text-[10px] font-bold uppercase tracking-widest block mb-1">Operando Sede</label>
+          <select value={selectedSede} onChange={handleSedeChange}
+            className="w-full bg-black border border-white/10 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none focus:border-indigo-500">
             <option value="">— Seleccionar Sede —</option>
             {sedes.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
           </select>
@@ -93,19 +88,14 @@ export default function Sidebar() {
       )}
 
       {/* Nav */}
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {NAV.map(({ to, label, icon }) => (
-          <NavLink
-            key={to}
-            to={to}
+          <NavLink key={to} to={to}
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
-                isActive
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                  : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                isActive ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20' : 'text-gray-400 hover:bg-white/5 hover:text-white'
               }`
-            }
-          >
+            }>
             <span className="text-base">{icon}</span>
             {label}
           </NavLink>
@@ -129,13 +119,37 @@ export default function Sidebar() {
             <p className="text-gray-500 text-[10px]">{user.role || 'CAJERO'}</p>
           </div>
         </div>
-        <button
-          onClick={logout}
-          className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-all"
-        >
+        <button onClick={logout}
+          className="w-full flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-all">
           <span>🚪</span> Cerrar Sesión
         </button>
       </div>
     </aside>
+  );
+
+  return (
+    <>
+      {/* Mobile hamburger */}
+      <button
+        className="md:hidden fixed top-4 left-4 z-50 bg-[#111827] border border-white/10 rounded-xl w-10 h-10 flex items-center justify-center text-white shadow-lg"
+        onClick={() => setIsOpen(true)}>
+        ☰
+      </button>
+
+      {/* Mobile overlay */}
+      {isOpen && (
+        <div className="md:hidden fixed inset-0 z-40 bg-black/70 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+      )}
+
+      {/* Mobile drawer */}
+      <div className={`md:hidden fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        {sidebarContent}
+      </div>
+
+      {/* Desktop sidebar (always visible) */}
+      <div className="hidden md:flex">
+        {sidebarContent}
+      </div>
+    </>
   );
 }

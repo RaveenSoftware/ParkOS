@@ -99,7 +99,7 @@ export default function Entrada() {
   const selectedSpot = spots.find(s => s.id === spotId);
 
   return (
-    <div className="p-8 max-w-5xl">
+    <div className="p-4 md:p-8 max-w-5xl">
       <div className="mb-8">
         <h1 className="text-3xl font-black text-white">Registrar Entrada</h1>
         <p className="text-gray-400 text-sm mt-1">Complete los datos del vehículo y seleccione la plaza de parqueo</p>

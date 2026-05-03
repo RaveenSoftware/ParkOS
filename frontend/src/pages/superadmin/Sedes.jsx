@@ -32,7 +32,7 @@ export default function SuperAdminSedes() {
   const totalRevenueToday = sedes.reduce((a, s) => a + Number(s.revenue_today || 0), 0);
 
   return (
-    <div className="p-8 space-y-6 max-w-[1400px]">
+    <div className="p-4 md:p-8 space-y-5 md:space-y-6 max-w-[1400px]">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-black text-white tracking-tight">Sedes Globales</h1>

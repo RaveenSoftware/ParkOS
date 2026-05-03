@@ -59,7 +59,7 @@ export default function AdminConfiguracion() {
   }
 
   return (
-    <div className="p-8 max-w-2xl space-y-8">
+    <div className="p-4 md:p-8 max-w-2xl space-y-6 md:space-y-8">
       <div>
         <h1 className="text-2xl font-black text-white tracking-tight">Configuración de la Empresa</h1>
         <p className="text-white/30 text-sm mt-1">Personaliza la identidad visual de tu plataforma y comprobantes.</p>

@@ -308,7 +308,7 @@ export default function SuperAdminTenants() {
     <>
       {modal && <TenantModal tenant={modal.tenant} plans={plans} onClose={() => setModal(null)} onSave={() => { setModal(null); load(); }} />}
 
-      <div className="p-8 space-y-6 max-w-[1400px]">
+      <div className="p-4 md:p-8 space-y-5 md:space-y-6 max-w-[1400px]">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-black text-white tracking-tight">Empresas Clientes</h1>

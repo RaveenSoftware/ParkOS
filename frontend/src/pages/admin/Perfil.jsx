@@ -41,7 +41,7 @@ export default function AdminPerfil() {
   );
 
   return (
-    <div className="p-8 space-y-8 max-w-3xl">
+    <div className="p-4 md:p-8 space-y-6 md:space-y-8 max-w-3xl">
       <div>
         <h1 className="text-2xl font-black text-white tracking-tight">Mi Plan y Perfil</h1>
         <p className="text-white/30 text-sm mt-1">Información de tu empresa y estado de suscripción</p>

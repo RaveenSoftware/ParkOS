@@ -49,7 +49,7 @@ export default function Dashboard() {
   const TYPE_COLOR = { CARRO: 'bg-blue-500', MOTO: 'bg-amber-500', BICICLETA: 'bg-emerald-500' };
 
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-4 md:p-8 space-y-6 md:space-y-8">
       <div>
         <h1 className="text-3xl font-black text-white">Dashboard</h1>
         <p className="text-gray-400 text-sm mt-1">Bienvenido, <span className="text-indigo-400 font-semibold">{user.name}</span> — {new Date().toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
@@ -70,25 +70,25 @@ export default function Dashboard() {
 
       {/* Recent activity */}
       <div className="bg-[#1a1f2e] rounded-2xl border border-white/5 overflow-hidden">
-        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+        <div className="px-4 md:px-6 py-4 border-b border-white/5 flex items-center justify-between">
           <h2 className="text-white font-bold">Actividad Reciente</h2>
-          <span className="text-gray-500 text-xs">Últimos 10 movimientos</span>
+          <span className="text-gray-500 text-xs hidden sm:inline">Últimos 10 movimientos</span>
         </div>
         <div className="divide-y divide-white/5">
           {recent.length === 0 ? (
             <p className="text-center text-gray-500 py-12 text-sm">Sin actividad aún</p>
           ) : recent.map(t => (
-            <div key={t.id} className="flex items-center gap-4 px-6 py-4">
-              <div className={`w-2 h-2 rounded-full ${TYPE_COLOR[t.vehicle_type] ?? 'bg-gray-500'}`} />
-              <div className="flex-1">
+            <div key={t.id} className="flex items-center gap-2 md:gap-4 px-4 md:px-6 py-3 md:py-4 flex-wrap">
+              <div className={`w-2 h-2 rounded-full shrink-0 ${TYPE_COLOR[t.vehicle_type] ?? 'bg-gray-500'}`} />
+              <div className="flex-1 min-w-0">
                 <span className="text-white font-bold text-sm">{t.plate}</span>
-                <span className="text-gray-500 text-xs ml-3">{t.vehicle_type}</span>
+                <span className="text-gray-500 text-xs ml-2">{t.vehicle_type}</span>
               </div>
               <span className={`text-xs font-bold px-2 py-1 rounded-lg ${t.status === 'ABIERTO' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-gray-500/15 text-gray-400'}`}>
                 {t.status}
               </span>
               {t.amount && <span className="text-indigo-400 text-sm font-bold">{formatCOP(t.amount)}</span>}
-              <span className="text-gray-600 text-xs">{new Date(t.entry_at).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}</span>
+              <span className="text-gray-600 text-xs hidden sm:inline">{new Date(t.entry_at).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}</span>
             </div>
           ))}
         </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '../../utils';
 import { api } from '../../api/client';
 
@@ -69,58 +69,37 @@ const Icons = {
       <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
     </svg>
   ),
+  Menu: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  ),
+  Close: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  ),
 };
 
 const menu = [
-  { name: 'Dashboard',     icon: Icons.Dashboard,    path: '/admin/dashboard'      },
-  { name: 'Mis Sedes',     icon: Icons.Sedes,        path: '/admin/sedes'          },
-  { name: 'Finanzas',      icon: Icons.Finanzas,     path: '/admin/finanzas'       },
-  { name: 'Monitor',       icon: Icons.Monitor,      path: '/admin/monitor'        },
-  { name: 'Diseño de Mapa',icon: Icons.Mapa,         path: '/admin/mapa'           },
-  { name: 'Tarifas',       icon: Icons.Tarifas,      path: '/admin/tarifas'        },
-  { name: 'Personal',      icon: Icons.Personal,     path: '/admin/cajeros'        },
-  { name: 'Reportes',      icon: Icons.Reportes,     path: '/admin/reportes'       },
-  { name: 'Mi Plan',       icon: Icons.Perfil,       path: '/admin/perfil'         },
-  { name: 'Configuración', icon: Icons.Configuracion, path: '/admin/configuracion' },
+  { name: 'Dashboard',      icon: Icons.Dashboard,    path: '/admin/dashboard'      },
+  { name: 'Mis Sedes',      icon: Icons.Sedes,        path: '/admin/sedes'          },
+  { name: 'Finanzas',       icon: Icons.Finanzas,     path: '/admin/finanzas'       },
+  { name: 'Monitor',        icon: Icons.Monitor,      path: '/admin/monitor'        },
+  { name: 'Diseño de Mapa', icon: Icons.Mapa,         path: '/admin/mapa'           },
+  { name: 'Tarifas',        icon: Icons.Tarifas,      path: '/admin/tarifas'        },
+  { name: 'Personal',       icon: Icons.Personal,     path: '/admin/cajeros'        },
+  { name: 'Reportes',       icon: Icons.Reportes,     path: '/admin/reportes'       },
+  { name: 'Mi Plan',        icon: Icons.Perfil,       path: '/admin/perfil'         },
+  { name: 'Configuración',  icon: Icons.Configuracion, path: '/admin/configuracion' },
 ];
 
-export default function AdminSidebar() {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [config, setConfig] = useState(null);
-  const navigate = useNavigate();
-
-  const user = (() => { try { return JSON.parse(localStorage.getItem('parkos_user') || '{}'); } catch { return {}; } })();
-
-  useEffect(() => {
-    // Only fetch if it's an admin of a tenant
-    if (user.role === 'ADMIN_TENANT') {
-      api.get('/config').then(data => {
-        if (data) setConfig(data);
-      }).catch(() => {});
-    }
-
-    const handleConfigUpdate = (e) => {
-      setConfig({ commercial_name: e.detail.commercialName, logo_base64: e.detail.logoBase64 });
-    };
-    window.addEventListener('configUpdated', handleConfigUpdate);
-    return () => window.removeEventListener('configUpdated', handleConfigUpdate);
-  }, [user.role]);
-
-  function handleLogout() {
-    localStorage.removeItem('parkos_token');
-    localStorage.removeItem('parkos_user');
-    navigate('/login');
-  }
-
+function SidebarContent({ isExpanded, onClose, config, user, handleLogout }) {
   return (
-    <aside
-      className={cn(
-        'bg-black border-r border-white/10 transition-all duration-300 flex flex-col relative z-20 select-none',
-        isExpanded ? 'w-60' : 'w-[72px]'
-      )}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
-    >
+    <aside className={cn(
+      'bg-black border-r border-white/10 flex flex-col relative z-20 select-none h-full transition-all duration-300',
+      isExpanded ? 'w-60' : 'w-[72px]'
+    )}>
       {/* Logo */}
       <div className={cn('flex items-center gap-3 border-b border-white/10 h-16 px-5', !isExpanded && 'justify-center px-0')}>
         <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shrink-0 overflow-hidden">
@@ -131,17 +110,23 @@ export default function AdminSidebar() {
           )}
         </div>
         {isExpanded && (
-          <div className="overflow-hidden whitespace-nowrap">
-            <p className="text-white font-black text-sm tracking-tight leading-none truncate max-w-[140px]">
+          <div className="overflow-hidden whitespace-nowrap flex-1">
+            <p className="text-white font-black text-sm tracking-tight leading-none truncate max-w-[120px]">
               {config?.commercial_name || user.tenantName || 'ParkOS'}
             </p>
             <p className="text-white/30 text-[10px] font-medium tracking-widest uppercase leading-none mt-0.5">Admin</p>
           </div>
         )}
+        {/* Mobile close */}
+        {onClose && (
+          <button onClick={onClose} className="ml-auto text-white/40 hover:text-white p-1 transition-colors shrink-0">
+            <Icons.Close />
+          </button>
+        )}
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 py-4 flex flex-col gap-1 px-2 overflow-hidden">
+      <nav className="flex-1 py-4 flex flex-col gap-1 px-2 overflow-y-auto overflow-x-hidden">
         {menu.map(item => (
           <NavLink key={item.path} to={item.path} title={!isExpanded ? item.name : undefined}
             className={({ isActive }) => cn(
@@ -160,7 +145,7 @@ export default function AdminSidebar() {
           </NavLink>
         ))}
 
-        {/* Acceso rápido al POS */}
+        {/* POS Access */}
         <div className="mt-2 pt-2 border-t border-white/5">
           <NavLink to="/pos/dashboard" title={!isExpanded ? 'Estación de Control' : undefined}
             className={({ isActive }) => cn(
@@ -183,12 +168,88 @@ export default function AdminSidebar() {
       {/* Logout */}
       <div className="border-t border-white/10 p-2">
         <button onClick={handleLogout} title={!isExpanded ? 'Cerrar Sesión' : undefined}
-          className={cn('flex items-center w-full rounded-lg h-10 transition-all duration-200 text-red-500 hover:bg-red-500/10 group overflow-hidden',
-            isExpanded ? 'px-3 gap-3' : 'justify-center px-0')}>
+          className={cn(
+            'flex items-center w-full rounded-lg h-10 transition-all duration-200 text-red-500 hover:bg-red-500/10 group overflow-hidden',
+            isExpanded ? 'px-3 gap-3' : 'justify-center px-0'
+          )}>
           <span className="shrink-0 group-hover:scale-110 transition-transform duration-200"><Icons.Logout /></span>
           {isExpanded && <span className="whitespace-nowrap text-sm font-semibold">Cerrar Sesión</span>}
         </button>
       </div>
     </aside>
+  );
+}
+
+export default function AdminSidebar() {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [config, setConfig] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const user = (() => { try { return JSON.parse(localStorage.getItem('parkos_user') || '{}'); } catch { return {}; } })();
+
+  // Close mobile menu on route change
+  useEffect(() => { setIsMobileOpen(false); }, [location.pathname]);
+
+  useEffect(() => {
+    if (user.role === 'ADMIN_TENANT') {
+      api.get('/config').then(data => { if (data) setConfig(data); }).catch(() => {});
+    }
+    const handleConfigUpdate = (e) => {
+      setConfig({ commercial_name: e.detail.commercialName, logo_base64: e.detail.logoBase64 });
+    };
+    window.addEventListener('configUpdated', handleConfigUpdate);
+    return () => window.removeEventListener('configUpdated', handleConfigUpdate);
+  }, [user.role]);
+
+  function handleLogout() {
+    localStorage.removeItem('parkos_token');
+    localStorage.removeItem('parkos_user');
+    navigate('/login');
+  }
+
+  return (
+    <>
+      {/* Mobile hamburger button */}
+      <button
+        className="md:hidden fixed top-4 left-4 z-50 bg-black border border-white/10 rounded-xl w-10 h-10 flex items-center justify-center text-white shadow-lg"
+        onClick={() => setIsMobileOpen(true)}>
+        <Icons.Menu />
+      </button>
+
+      {/* Mobile overlay */}
+      {isMobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 z-40 bg-black/70 backdrop-blur-sm"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile Drawer */}
+      <div className={`md:hidden fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <SidebarContent
+          isExpanded={true}
+          onClose={() => setIsMobileOpen(false)}
+          config={config}
+          user={user}
+          handleLogout={handleLogout}
+        />
+      </div>
+
+      {/* Desktop Sidebar (hover to expand) */}
+      <div
+        className="hidden md:flex"
+        onMouseEnter={() => setIsExpanded(true)}
+        onMouseLeave={() => setIsExpanded(false)}
+      >
+        <SidebarContent
+          isExpanded={isExpanded}
+          config={config}
+          user={user}
+          handleLogout={handleLogout}
+        />
+      </div>
+    </>
   );
 }

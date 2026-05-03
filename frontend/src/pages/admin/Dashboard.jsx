@@ -119,14 +119,14 @@ export default function AdminDashboard() {
   const STATUS_COLOR = { ACTIVE: 'text-green-400', TRIAL: 'text-blue-400', PAST_DUE: 'text-yellow-400', SUSPENDED: 'text-red-400' };
 
   return (
-    <div className="p-8 space-y-8 max-w-[1400px]">
+    <div className="p-4 md:p-8 space-y-6 md:space-y-8 max-w-[1400px]">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-black text-white tracking-tight">Dashboard Corporativo</h1>
+          <h1 className="text-xl md:text-2xl font-black text-white tracking-tight">Dashboard Corporativo</h1>
           <p className="text-white/30 text-sm mt-1">Bienvenido, <span className="text-white">{user.name}</span> — resumen global de tu empresa</p>
         </div>
-        <div className="text-right">
+        <div className="sm:text-right">
           <p className="text-white/20 text-xs uppercase tracking-widest">Hoy</p>
           <p className="text-white/50 text-xs font-mono">{new Date().toLocaleDateString('es-CO', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
         </div>
@@ -220,9 +220,10 @@ export default function AdminDashboard() {
 
       {/* Tabla resumen por sede */}
       <div className="bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden">
-        <div className="px-6 py-4 border-b border-white/10">
+        <div className="px-4 md:px-6 py-4 border-b border-white/10">
           <h3 className="text-white font-bold text-sm">Estado por Sede</h3>
         </div>
+        <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-white/5">
@@ -265,6 +266,7 @@ export default function AdminDashboard() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

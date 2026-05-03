@@ -61,7 +61,7 @@ function SuperAdminLayout() {
   return (
     <div className="flex min-h-screen bg-[#0f1117]">
       <SuperAdminSidebar />
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto pt-16 md:pt-0">
         <Outlet />
       </main>
     </div>
@@ -72,7 +72,7 @@ function AdminLayout() {
   return (
     <div className="flex h-screen bg-[#0f1117] overflow-hidden">
       <AdminSidebar />
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto pt-16 md:pt-0">
         <Outlet />
       </main>
     </div>
@@ -83,7 +83,7 @@ function PosLayout() {
   return (
     <div className="flex h-screen bg-[#0f1117] overflow-hidden">
       <PosSidebar />
-      <main className="flex-1 overflow-y-auto flex flex-col">
+      <main className="flex-1 overflow-y-auto flex flex-col pt-16 md:pt-0">
         <Outlet />
       </main>
     </div>
