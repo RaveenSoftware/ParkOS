@@ -90,12 +90,11 @@ const ExpenseController = {
       let idx = 2;
 
       if (sedeId) { query += ` AND e.sede_id = $${idx++}`; params.push(sedeId); }
-      if (from)   { query += ` AND DATE(e.created_at) >= $${idx++}`; params.push(from); }
-      if (to)     { query += ` AND DATE(e.created_at) <= $${idx++}`; params.push(to); }
+      if (from)   { query += ` AND DATE(e.created_at - INTERVAL '5 hours') >= $${idx++}`; params.push(from); }
+      if (to)     { query += ` AND DATE(e.created_at - INTERVAL '5 hours') <= $${idx++}`; params.push(to); }
 
       query += ' ORDER BY e.created_at DESC LIMIT 500';
       const result = await pool.query(query, params);
-      res.set('Cache-Control', 'no-store');
       res.json(result.rows);
     } catch (err) {
       res.status(500).json({ error: err.message });
