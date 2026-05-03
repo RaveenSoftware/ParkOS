@@ -4,8 +4,8 @@ import { api } from '../api/client';
 import { printTicket } from '../utils/printTicket';
 
 const TYPE_ICON  = { CARRO: '🚗', MOTO: '🏍️', BICICLETA: '🚲', CAMION: '🚛' };
-const RATES      = { CARRO: 100, MOTO: 60, BICICLETA: 30, CAMION: 200 };
-const MIN_CHARGE = { CARRO: 1000, MOTO: 600, BICICLETA: 300, CAMION: 2000 };
+const FALLBACK_RATES      = { CARRO: 2000, MOTO: 1200, BICICLETA: 600, CAMION: 4000 };
+const FALLBACK_MIN_CHARGE = { CARRO: 1000, MOTO: 600, BICICLETA: 300, CAMION: 2000 };
 
 function formatCOP(n) {
   return Number(n).toLocaleString('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 });
@@ -27,13 +27,30 @@ function formatDuration(mins) {
   return parts.join(' ');
 }
 
-function estimate(type, mins) {
+function estimate(type, mins, ratesMap) {
   if (!mins || mins < 0) mins = 0;
-  const rate = RATES[type] || RATES['CARRO'];
-  const min = MIN_CHARGE[type] || MIN_CHARGE['CARRO'];
-  const amt = Math.max(mins * rate, min);
-  if (Number.isNaN(amt)) return '$ 0';
-  return formatCOP(amt);
+  const minutes = Math.max(0, Math.ceil(Number(mins) || 0));
+  
+  const rateHora = ratesMap ? (ratesMap[type]?.['POR_HORA']?.amount || 0) : (FALLBACK_RATES[type] || FALLBACK_RATES['CARRO']);
+  const rateMinimo = ratesMap ? (ratesMap[type]?.['MINIMO']?.amount || 0) : (FALLBACK_MIN_CHARGE[type] || FALLBACK_MIN_CHARGE['CARRO']);
+
+  let amount = 0;
+  if (minutes > 0) {
+    const h = Math.floor(minutes / 60);
+    const extraMins = minutes % 60;
+
+    if (h === 0) {
+      amount = rateMinimo;
+    } else {
+      amount = h * rateHora;
+      if (extraMins > 0) {
+        amount += rateMinimo;
+      }
+    }
+  }
+
+  if (Number.isNaN(amount)) return '$ 0';
+  return formatCOP(amount);
 }
 
 /* ─── Toast in-app notification ─────────────────────────────── */
@@ -116,8 +133,21 @@ export default function Tickets() {
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [search, setSearch] = useState('');
   const [toast, setToast] = useState(null);
+  const [ratesData, setRatesData] = useState(null);
 
   const showToast = (message, type = 'success') => setToast({ message, type });
+
+  const loadRates = useCallback(async () => {
+    try {
+      const user = (() => { try { return JSON.parse(localStorage.getItem('parkos_user') || '{}'); } catch { return {}; } })();
+      const sedeId = localStorage.getItem('parkos_pos_sedeId') || user.sedeId;
+      if (!sedeId) return;
+      const data = await api.get(`/rates/sede/${sedeId}`);
+      setRatesData(data);
+    } catch (e) {
+      console.error('Error loading rates:', e);
+    }
+  }, []);
 
   const load = useCallback(async () => {
     try {
@@ -131,10 +161,11 @@ export default function Tickets() {
   }, []);
 
   useEffect(() => {
+    loadRates();
     load();
     const iv = setInterval(load, 15000);
     return () => clearInterval(iv);
-  }, [load]);
+  }, [load, loadRates]);
 
   async function handleCheckout(billingData) {
     setCheckingOut(true);
@@ -248,7 +279,7 @@ export default function Tickets() {
                 </div>
 
                 <div className="text-right">
-                  <p className="text-amber-400 font-black text-lg">{estimate(ticket.vehicle_type, ticket.minutes_so_far)}</p>
+                  <p className="text-amber-400 font-black text-lg">{estimate(ticket.vehicle_type, ticket.minutes_so_far, ratesData)}</p>
                   <p className="text-gray-500 text-xs">{formatDuration(ticket.minutes_so_far)}</p>
                 </div>
 
