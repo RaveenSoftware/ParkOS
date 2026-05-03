@@ -1,16 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const ExpenseController = require('../controllers/expense.controller');
-const { auth } = require('../middleware/auth.middleware');
+const { auth, requireRole } = require('../middleware/auth.middleware');
 
 router.use(auth);
-router.use((req, res, next) => {
-  if (['CAJERO', 'ADMIN_TENANT'].includes(req.user.role)) next();
-  else res.status(403).json({ error: 'Acceso denegado' });
-});
 
-router.get('/:shiftId', ExpenseController.getExpenses);
-router.post('/', ExpenseController.createExpense);
+// POS routes (cajero / admin_tenant)
+router.get('/:shiftId', requireRole(['CAJERO', 'ADMIN_TENANT', 'SUPERADMIN']), ExpenseController.getExpenses);
+router.post('/',        requireRole(['CAJERO', 'ADMIN_TENANT', 'SUPERADMIN']), ExpenseController.createExpense);
+
+// Admin routes (no shift required)
+router.get('/admin/all',   requireRole(['ADMIN_TENANT', 'SUPERADMIN']), ExpenseController.getAllExpenses);
+router.post('/admin/new',  requireRole(['ADMIN_TENANT', 'SUPERADMIN']), ExpenseController.createAdminExpense);
+router.delete('/admin/:id', requireRole(['ADMIN_TENANT', 'SUPERADMIN']), ExpenseController.deleteExpense);
 
 module.exports = router;
 

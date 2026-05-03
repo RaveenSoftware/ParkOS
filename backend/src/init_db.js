@@ -159,6 +159,15 @@ async function initDb() {
     END $$;
   `);
 
+  // Migrate cash_expenses: add category column if missing
+  await pool.query(`
+    DO $$ BEGIN
+      IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='cash_expenses' AND column_name='category') THEN
+        ALTER TABLE cash_expenses ADD COLUMN category VARCHAR(50) DEFAULT 'OTRO';
+      END IF;
+    END $$;
+  `);
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS sedes (
       id          SERIAL PRIMARY KEY,
