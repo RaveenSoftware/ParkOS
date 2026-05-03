@@ -45,7 +45,7 @@ const ExpenseController = {
     } catch (err) {
       res.status(500).json({ error: err.message });
     }
-  }
+  },
   // ADMIN: Registrar egreso directo sin necesidad de turno
   async createAdminExpense(req, res) {
     try {
