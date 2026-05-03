@@ -11,21 +11,11 @@ export default function Login() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
-    {
-      img: '/slide1.png',
-      title: 'Panel de Control Inteligente',
-      desc: 'Supervisa la ocupación, ingresos y estadísticas clave en tiempo real desde un dashboard centralizado.'
-    },
-    {
-      img: '/slide2.png',
-      title: 'Punto de Venta Profesional',
-      desc: 'Opera la caja con velocidad. Registra entradas, controla vehículos y emite facturas de inmediato.'
-    },
-    {
-      img: '/slide3.png',
-      title: 'Gestión Multi-Sede',
-      desc: 'Administra múltiples sucursales, tarifas, usuarios y roles desde una única plataforma en la nube.'
-    }
+    { img: '/Slide1.png' },
+    { img: '/Slide2.png' },
+    { img: '/Slide3.png' },
+    { img: '/Slide4.png' },
+    { img: '/Slide5.png' }
   ];
 
   useEffect(() => {
@@ -63,41 +53,21 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-[#0f1117] flex">
       {/* Left panel - Carousel */}
-      <div className="hidden lg:flex flex-1 relative overflow-hidden bg-gradient-to-br from-[#0f1117] to-[#1a1f2e]">
-        {/* Logo overlay */}
-        <div className="absolute top-12 left-12 z-20 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-indigo-500/50">P</div>
-          <span className="text-white font-black text-2xl tracking-tight drop-shadow-md">ParkOS</span>
-        </div>
-
+      <div className="hidden lg:flex flex-1 relative overflow-hidden bg-[#090a0f]">
+        
         {/* Carousel slides */}
         {slides.map((slide, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out flex items-center justify-center p-8 ${
               index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
             }`}
           >
             {/* Background image */}
             <div 
-              className="absolute inset-0 bg-cover bg-center transition-transform duration-[10000ms] ease-linear"
-              style={{ 
-                backgroundImage: `url('${slide.img}')`,
-                transform: index === currentSlide ? 'scale(1.05)' : 'scale(1)'
-              }}
+              className="w-full h-full bg-contain bg-no-repeat bg-center"
+              style={{ backgroundImage: `url('${slide.img}')` }}
             />
-            {/* Gradient overlay to make text readable */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0f1117] via-[#0f1117]/60 to-transparent" />
-            
-            {/* Slide content */}
-            <div className="absolute bottom-0 left-0 right-0 p-16 pb-20">
-              <h2 className="text-4xl font-black text-white mb-4 drop-shadow-lg transform translate-y-0 transition-transform duration-700">
-                {slide.title}
-              </h2>
-              <p className="text-gray-300 text-lg font-medium max-w-lg drop-shadow-md">
-                {slide.desc}
-              </p>
-            </div>
           </div>
         ))}
 
