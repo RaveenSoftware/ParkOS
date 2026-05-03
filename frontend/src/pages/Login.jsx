@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 
@@ -8,22 +8,6 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  const slides = [
-    { img: '/slide1.png' },
-    { img: '/slide2.png' },
-    { img: '/slide3.png' },
-    { img: '/slide4.png' },
-    { img: '/slide5.png' }
-  ];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [slides.length]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -52,37 +36,31 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-[#0f1117] flex">
-      {/* Left panel - Carousel */}
-      <div className="hidden lg:flex flex-1 relative overflow-hidden bg-[#090a0f]">
-        
-        {/* Carousel slides */}
-        {slides.map((slide, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out flex items-center justify-center p-8 ${
-              index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
-            }`}
-          >
-            {/* Background image */}
-            <div 
-              className="w-full h-full bg-contain bg-no-repeat bg-center"
-              style={{ backgroundImage: `url('${slide.img}')` }}
-            />
-          </div>
-        ))}
+      {/* Left panel - Static Illustration */}
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 flex-col relative overflow-hidden">
+        {/* Logo overlay */}
+        <div className="absolute top-12 left-12 z-20 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-indigo-500/50">P</div>
+          <span className="text-white font-black text-2xl tracking-tight drop-shadow-md">ParkOS</span>
+        </div>
 
-        {/* Slide indicators */}
-        <div className="absolute bottom-12 left-16 z-20 flex gap-2">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`h-1.5 rounded-full transition-all duration-500 ${
-                index === currentSlide ? 'w-8 bg-indigo-500' : 'w-2 bg-white/30 hover:bg-white/50'
-              }`}
-              aria-label={`Ir a slide ${index + 1}`}
-            />
-          ))}
+        {/* 3D Illustration */}
+        <div className="flex-1 flex items-center justify-center p-12 mt-8">
+          <img 
+            src="/login-illustration.png" 
+            alt="ParkOS Illustration" 
+            className="max-w-full max-h-[75%] object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-700" 
+          />
+        </div>
+        
+        {/* Bottom Text */}
+        <div className="absolute bottom-16 left-12 right-12 text-center">
+          <h2 className="text-4xl font-black text-white mb-3 drop-shadow-lg tracking-tight">
+            Gestión inteligente de parqueaderos
+          </h2>
+          <p className="text-indigo-200 text-lg font-medium drop-shadow-md">
+            Rapidez, control y seguridad en cada ticket.
+          </p>
         </div>
       </div>
 
