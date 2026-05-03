@@ -51,22 +51,22 @@ function TrendChart({ trend = [] }) {
   );
   const maxVal = Math.max(...trend.map(t => Math.max(t.income, t.expense)), 1);
   return (
-    <div className="flex items-end gap-0.5 h-44 w-full overflow-x-auto pb-5 pt-2">
+    <div className="flex items-end gap-1 h-44 w-full overflow-x-auto pb-5 pt-2">
       {trend.map((t, i) => {
         const ip = Math.max((t.income  / maxVal) * 100, t.income  > 0 ? 3 : 0);
         const ep = Math.max((t.expense / maxVal) * 100, t.expense > 0 ? 3 : 0);
         return (
-          <div key={i} className="flex-1 flex flex-col items-center justify-end gap-0.5 group relative min-w-[16px]">
-            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-[#0d1117] border border-white/10 text-[10px] px-2 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 z-10 pointer-events-none shadow-xl">
-              <p className="text-white/50 font-bold mb-0.5">{t.label}</p>
-              <p className="text-emerald-400">Ing: {formatCOP(t.income)}</p>
-              {t.expense > 0 && <p className="text-red-400">Egr: {formatCOP(t.expense)}</p>}
+          <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1 group relative min-w-[16px] h-full">
+            <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-[#0d1117] border border-white/10 text-[10px] px-3 py-2 rounded-xl whitespace-nowrap opacity-0 group-hover:opacity-100 z-10 pointer-events-none shadow-2xl transition-all">
+              <p className="text-white/50 font-bold mb-1">{t.label}</p>
+              <p className="text-emerald-400 font-bold">Ing: {formatCOP(t.income)}</p>
+              {t.expense > 0 && <p className="text-red-400 font-bold">Egr: {formatCOP(t.expense)}</p>}
             </div>
-            <div className="flex items-end gap-[1px] w-full px-[1px]" style={{ height: '100%' }}>
-              <div className="w-1/2 bg-emerald-500 rounded-t-sm transition-all" style={{ height: `${ip}%` }} />
-              <div className="w-1/2 bg-red-500   rounded-t-sm transition-all" style={{ height: `${ep}%` }} />
+            <div className="flex items-end gap-[2px] w-full px-[1px] h-full">
+              <div className="w-1/2 bg-emerald-500 rounded-t-sm transition-all opacity-80 group-hover:opacity-100" style={{ height: `${ip}%` }} />
+              <div className="w-1/2 bg-red-500 rounded-t-sm transition-all opacity-80 group-hover:opacity-100" style={{ height: `${ep}%` }} />
             </div>
-            <span className="text-white/20 text-[7px] font-mono whitespace-nowrap mt-1">{t.label}</span>
+            <span className="text-white/20 text-[8px] font-mono whitespace-nowrap mt-1 group-hover:text-white/50 transition-colors">{t.label}</span>
           </div>
         );
       })}

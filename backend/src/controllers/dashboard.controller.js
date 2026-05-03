@@ -191,17 +191,17 @@ const DashboardController = {
           SELECT generate_series(CURRENT_DATE - INTERVAL '29 days', CURRENT_DATE, '1 day')::date AS day
         ),
         income AS (
-          SELECT DATE(exit_at) AS day, COALESCE(SUM(amount), 0) AS amount
+          SELECT DATE(exit_at - INTERVAL '5 hours') AS day, COALESCE(SUM(amount), 0) AS amount
           FROM tickets
           WHERE sede_id IN (SELECT id FROM sedes WHERE tenant_id = $1) AND status = 'CERRADO'
-            AND exit_at >= CURRENT_DATE - INTERVAL '29 days'
-          GROUP BY DATE(exit_at)
+            AND exit_at >= CURRENT_DATE - INTERVAL '30 days'
+          GROUP BY DATE(exit_at - INTERVAL '5 hours')
         ),
         expenses AS (
-          SELECT DATE(created_at) AS day, COALESCE(SUM(amount), 0) AS amount
+          SELECT DATE(created_at - INTERVAL '5 hours') AS day, COALESCE(SUM(amount), 0) AS amount
           FROM cash_expenses
-          WHERE tenant_id = $1 AND created_at >= CURRENT_DATE - INTERVAL '29 days'
-          GROUP BY DATE(created_at)
+          WHERE tenant_id = $1 AND created_at >= CURRENT_DATE - INTERVAL '30 days'
+          GROUP BY DATE(created_at - INTERVAL '5 hours')
         )
         SELECT 
           TO_CHAR(d.day, 'DD/MM') AS label,
