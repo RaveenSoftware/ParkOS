@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 
@@ -8,6 +8,32 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const slides = [
+    {
+      img: '/slide1.png',
+      title: 'Panel de Control Inteligente',
+      desc: 'Supervisa la ocupación, ingresos y estadísticas clave en tiempo real desde un dashboard centralizado.'
+    },
+    {
+      img: '/slide2.png',
+      title: 'Punto de Venta Profesional',
+      desc: 'Opera la caja con velocidad. Registra entradas, controla vehículos y emite facturas de inmediato.'
+    },
+    {
+      img: '/slide3.png',
+      title: 'Gestión Multi-Sede',
+      desc: 'Administra múltiples sucursales, tarifas, usuarios y roles desde una única plataforma en la nube.'
+    }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [slides.length]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -19,7 +45,6 @@ export default function Login() {
         localStorage.setItem('parkos_token', data.token);
         localStorage.setItem('parkos_user', JSON.stringify(data.user));
         
-        // Redirect based on role
         if (data.user.role === 'SUPERADMIN') {
           navigate('/superadmin/dashboard');
         } else if (data.user.role === 'ADMIN_TENANT') {
@@ -37,27 +62,56 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-[#0f1117] flex">
-      {/* Left panel */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 flex-col justify-between p-12">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center text-white font-black text-lg">P</div>
-          <span className="text-white font-black text-xl tracking-tight">ParkOS</span>
+      {/* Left panel - Carousel */}
+      <div className="hidden lg:flex flex-1 relative overflow-hidden bg-gradient-to-br from-[#0f1117] to-[#1a1f2e]">
+        {/* Logo overlay */}
+        <div className="absolute top-12 left-12 z-20 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-indigo-500/50">P</div>
+          <span className="text-white font-black text-2xl tracking-tight drop-shadow-md">ParkOS</span>
         </div>
-        <div>
-          <h1 className="text-5xl font-black text-white leading-tight mb-4">
-            Control total de<br />tu parqueadero
-          </h1>
-          <p className="text-indigo-200 text-lg font-medium">
-            Registra entradas, controla salidas y visualiza ingresos en tiempo real.
-          </p>
-        </div>
-        <div className="grid grid-cols-3 gap-4">
-          {[['🚗', 'Entradas', 'Registro rápido'],['🎫', 'Tickets', 'Control en tiempo real'],['💰', 'Cobros', 'Cálculo automático']].map(([icon, title, sub]) => (
-            <div key={title} className="bg-white/10 rounded-2xl p-4 backdrop-blur">
-              <p className="text-2xl mb-2">{icon}</p>
-              <p className="text-white font-bold text-sm">{title}</p>
-              <p className="text-indigo-200 text-xs mt-0.5">{sub}</p>
+
+        {/* Carousel slides */}
+        {slides.map((slide, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              index === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0'
+            }`}
+          >
+            {/* Background image */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center transition-transform duration-[10000ms] ease-linear"
+              style={{ 
+                backgroundImage: \`url('\${slide.img}')\`,
+                transform: index === currentSlide ? 'scale(1.05)' : 'scale(1)'
+              }}
+            />
+            {/* Gradient overlay to make text readable */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0f1117] via-[#0f1117]/60 to-transparent" />
+            
+            {/* Slide content */}
+            <div className="absolute bottom-0 left-0 right-0 p-16 pb-20">
+              <h2 className="text-4xl font-black text-white mb-4 drop-shadow-lg transform translate-y-0 transition-transform duration-700">
+                {slide.title}
+              </h2>
+              <p className="text-gray-300 text-lg font-medium max-w-lg drop-shadow-md">
+                {slide.desc}
+              </p>
             </div>
+          </div>
+        ))}
+
+        {/* Slide indicators */}
+        <div className="absolute bottom-12 left-16 z-20 flex gap-2">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`h-1.5 rounded-full transition-all duration-500 ${
+                index === currentSlide ? 'w-8 bg-indigo-500' : 'w-2 bg-white/30 hover:bg-white/50'
+              }`}
+              aria-label={`Ir a slide ${index + 1}`}
+            />
           ))}
         </div>
       </div>
