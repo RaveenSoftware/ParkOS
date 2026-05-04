@@ -35,26 +35,26 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f1117] flex">
-      {/* Left panel - Static Illustration */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#0f1117] flex flex-col lg:flex-row">
+      {/* Top/Left panel - Static Illustration */}
+      <div className="flex flex-col lg:flex-1 bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 relative overflow-hidden shrink-0 min-h-[250px] lg:min-h-0 justify-center">
         {/* Logo overlay */}
-        <div className="absolute top-12 left-12 z-20 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-indigo-500/50">P</div>
-          <span className="text-white font-black text-2xl tracking-tight drop-shadow-md">ParkOS</span>
+        <div className="absolute top-6 left-6 lg:top-12 lg:left-12 z-20 flex items-center gap-3">
+          <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-xl lg:rounded-2xl bg-white/20 flex items-center justify-center text-white font-black text-sm lg:text-lg shadow-lg shadow-indigo-500/50">P</div>
+          <span className="text-white font-black text-xl lg:text-2xl tracking-tight drop-shadow-md">ParkOS</span>
         </div>
 
         {/* 3D Illustration */}
-        <div className="flex-1 flex items-center justify-center p-12 mt-8">
+        <div className="flex-1 flex items-center justify-center p-6 lg:p-12 mt-12 lg:mt-8">
           <img 
             src="/login-illustration.png" 
             alt="ParkOS Illustration" 
-            className="max-w-full max-h-[75%] object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-700" 
+            className="w-40 lg:w-auto max-w-full lg:max-h-[75%] object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-700" 
           />
         </div>
         
-        {/* Bottom Text */}
-        <div className="absolute bottom-16 left-12 right-12 text-center">
+        {/* Bottom Text - Desktop only */}
+        <div className="hidden lg:block absolute bottom-16 left-12 right-12 text-center">
           <h2 className="text-4xl font-black text-white mb-3 drop-shadow-lg tracking-tight">
             Gestión inteligente de parqueaderos
           </h2>
@@ -64,12 +64,11 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Right panel - Form */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      {/* Bottom/Right panel - Form */}
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-8">
         <div className="w-full max-w-sm">
-          <div className="mb-10">
-            <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-black text-xl mb-6 lg:hidden">P</div>
-            <h2 className="text-3xl font-black text-white mb-2">Iniciar Sesión</h2>
+          <div className="mb-8 lg:mb-10">
+            <h2 className="text-2xl lg:text-3xl font-black text-white mb-2">Iniciar Sesión</h2>
             <p className="text-gray-400 text-sm">Ingresa tus credenciales para continuar</p>
           </div>
 
