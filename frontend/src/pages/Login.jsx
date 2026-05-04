@@ -35,26 +35,30 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f1117] flex flex-col lg:flex-row">
+    <div className="min-h-screen bg-[#0f1117] flex flex-col lg:flex-row relative">
       {/* Top/Left panel - Static Illustration */}
-      <div className="flex flex-col lg:flex-1 bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 relative overflow-hidden shrink-0 min-h-[250px] lg:min-h-0 justify-center">
+      <div className="flex flex-col lg:flex-1 bg-transparent lg:bg-gradient-to-br lg:from-indigo-600 lg:via-violet-600 lg:to-purple-700 relative overflow-hidden shrink-0 pt-12 pb-4 lg:py-0 justify-start lg:justify-center items-center lg:items-stretch z-10">
+        
+        {/* Mobile Ambient Glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-[400px] bg-indigo-600/20 blur-[100px] rounded-full lg:hidden -z-10 pointer-events-none" />
+
         {/* Logo overlay */}
-        <div className="absolute top-6 left-6 lg:top-12 lg:left-12 z-20 flex items-center gap-3">
-          <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-xl lg:rounded-2xl bg-white/20 flex items-center justify-center text-white font-black text-sm lg:text-lg shadow-lg shadow-indigo-500/50">P</div>
-          <span className="text-white font-black text-xl lg:text-2xl tracking-tight drop-shadow-md">ParkOS</span>
+        <div className="static lg:absolute lg:top-12 lg:left-12 flex flex-col lg:flex-row items-center gap-3 mb-8 lg:mb-0 z-20">
+          <div className="w-12 h-12 lg:w-10 lg:h-10 rounded-2xl bg-indigo-600 lg:bg-white/20 flex items-center justify-center text-white font-black text-xl lg:text-lg shadow-lg lg:shadow-indigo-500/50">P</div>
+          <span className="text-white font-black text-3xl lg:text-2xl tracking-tight drop-shadow-md">ParkOS</span>
         </div>
 
         {/* 3D Illustration */}
-        <div className="flex-1 flex items-center justify-center p-6 lg:p-12 mt-12 lg:mt-8">
+        <div className="flex-1 flex items-center justify-center p-4 lg:p-12 lg:mt-8 w-full max-w-[280px] lg:max-w-none">
           <img 
             src="/login-illustration.png" 
             alt="ParkOS Illustration" 
-            className="w-40 lg:w-auto max-w-full lg:max-h-[75%] object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-700" 
+            className="w-full h-auto lg:max-h-[75%] object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-700" 
           />
         </div>
         
         {/* Bottom Text - Desktop only */}
-        <div className="hidden lg:block absolute bottom-16 left-12 right-12 text-center">
+        <div className="hidden lg:block absolute bottom-16 left-12 right-12 text-center z-20">
           <h2 className="text-4xl font-black text-white mb-3 drop-shadow-lg tracking-tight">
             Gestión inteligente de parqueaderos
           </h2>
@@ -65,9 +69,9 @@ export default function Login() {
       </div>
 
       {/* Bottom/Right panel - Form */}
-      <div className="flex-1 flex items-center justify-center p-6 lg:p-8">
+      <div className="flex-1 flex items-start lg:items-center justify-center p-8 lg:p-8 z-10">
         <div className="w-full max-w-sm">
-          <div className="mb-8 lg:mb-10">
+          <div className="mb-8 lg:mb-10 text-center lg:text-left">
             <h2 className="text-2xl lg:text-3xl font-black text-white mb-2">Iniciar Sesión</h2>
             <p className="text-gray-400 text-sm">Ingresa tus credenciales para continuar</p>
           </div>
