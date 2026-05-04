@@ -71,8 +71,8 @@ function SidebarContent({ isExpanded, onClose, handleLogout }) {
     )}>
       {/* Logo */}
       <div className={cn('flex items-center gap-3 border-b border-white/10 h-16 px-5', !isExpanded && 'justify-center px-0')}>
-        <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shrink-0">
-          <span className="text-black font-black text-sm tracking-tighter">PK</span>
+        <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center shrink-0 overflow-hidden">
+          <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" onError={(e) => { e.target.style.display='none'; e.target.parentNode.innerHTML='<span class="text-black font-black text-sm">P</span>'; }} />
         </div>
         {isExpanded && (
           <div className="overflow-hidden whitespace-nowrap flex-1">
@@ -88,7 +88,7 @@ function SidebarContent({ isExpanded, onClose, handleLogout }) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 py-4 flex flex-col gap-1 px-2 overflow-y-auto overflow-x-hidden">
+      <nav className="flex-1 py-4 flex flex-col gap-1 px-2 overflow-y-auto overflow-x-hidden min-h-0">
         {menu.map(item => (
           <NavLink key={item.path} to={item.path} title={!isExpanded ? item.name : undefined}
             className={({ isActive }) => cn(

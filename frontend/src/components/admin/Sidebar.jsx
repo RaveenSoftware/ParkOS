@@ -106,7 +106,7 @@ function SidebarContent({ isExpanded, onClose, config, user, handleLogout }) {
           {config?.logo_base64 ? (
             <img src={config.logo_base64} alt="Logo" className="w-full h-full object-cover" />
           ) : (
-            <span className="text-black font-black text-sm tracking-tighter">PK</span>
+            <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" onError={(e) => { e.target.style.display='none'; e.target.parentNode.innerHTML='<span class="text-black font-black text-sm">P</span>'; }} />
           )}
         </div>
         {isExpanded && (
@@ -126,7 +126,7 @@ function SidebarContent({ isExpanded, onClose, config, user, handleLogout }) {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 py-4 flex flex-col gap-1 px-2 overflow-y-auto overflow-x-hidden">
+      <nav className="flex-1 py-4 flex flex-col gap-1 px-2 overflow-y-auto overflow-x-hidden min-h-0">
         {menu.map(item => (
           <NavLink key={item.path} to={item.path} title={!isExpanded ? item.name : undefined}
             className={({ isActive }) => cn(

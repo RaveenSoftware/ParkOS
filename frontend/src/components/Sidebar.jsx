@@ -64,7 +64,9 @@ export default function Sidebar() {
           <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black text-sm overflow-hidden shrink-0">
             {config?.logo_base64 ? (
               <img src={config.logo_base64} alt="Logo" className="w-full h-full object-cover" />
-            ) : 'P'}
+            ) : (
+              <img src="/logo.png" alt="Logo" className="w-full h-full object-contain" onError={(e) => { e.target.style.display='none'; e.target.parentNode.innerHTML='P'; }} />
+            )}
           </div>
           <div className="overflow-hidden">
             <p className="text-white font-black text-sm tracking-tight truncate">{config?.commercial_name || user.tenantName || 'ParkOS'}</p>
@@ -88,7 +90,7 @@ export default function Sidebar() {
       )}
 
       {/* Nav */}
-      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto min-h-0">
         {NAV.map(({ to, label, icon }) => (
           <NavLink key={to} to={to}
             className={({ isActive }) =>
