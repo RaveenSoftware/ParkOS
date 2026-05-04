@@ -50,7 +50,7 @@ export default function Login() {
 
           {/* Logo */}
           <div className="flex items-center justify-center lg:justify-start relative z-10 mb-8 lg:mb-0">
-            <img src="/logo.png" alt="Tenant Logo" className="h-12 lg:h-14 object-contain drop-shadow-lg" />
+            <img src="/logo.png" alt="Company Logo" className="h-12 lg:h-16 object-contain drop-shadow-lg" />
           </div>
 
           {/* 3D Illustration */}
