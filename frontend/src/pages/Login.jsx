@@ -49,9 +49,8 @@ export default function Login() {
           <div className="absolute inset-0 bg-indigo-500/5 blur-[80px] pointer-events-none" />
 
           {/* Logo */}
-          <div className="flex items-center justify-center lg:justify-start gap-3 relative z-10 mb-8 lg:mb-0">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-indigo-500/30">P</div>
-            <span className="text-white font-black text-2xl tracking-tight">ParkOS</span>
+          <div className="flex items-center justify-center lg:justify-start relative z-10 mb-8 lg:mb-0">
+            <img src="/logo.png" alt="Tenant Logo" className="h-12 lg:h-14 object-contain drop-shadow-lg" />
           </div>
 
           {/* 3D Illustration */}
